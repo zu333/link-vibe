@@ -19,35 +19,25 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
         h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Outfit', sans-serif; }
 
+        /* Navbar & Utilities */
         .navbar { position: sticky; top: 0; z-index: 100; background: rgba(255, 248, 243, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; transition: box-shadow 0.3s; }
         .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); transition: border-color 0.3s; }
-        .avatar:hover { border-color: var(--accent); }
-        .avatar-sm { width: 34px; height: 34px; } .avatar-lg { width: 56px; height: 56px; }
-
         .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
         .link-bar { background: var(--card); border-radius: 20px; border: 2px dashed var(--border); overflow: hidden; }
         .link-bar:focus-within { border-color: var(--accent); border-style: solid; box-shadow: 0 0 0 4px rgba(232, 97, 60, 0.1); }
         .link-bar input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
-        
         .btn-post { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 14px; padding: 0.6rem 1.5rem; font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* Modals & Effects */
         .modal-overlay { position: fixed; inset: 0; background: rgba(45, 42, 50, 0.6); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
         .modal-content { background: var(--card); border-radius: 24px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.3s; text-align: center; max-height: 90vh; overflow-y: auto;}
         .modal-overlay.open .modal-content { transform: scale(1); }
-        
         .shimmer { background: linear-gradient(90deg, var(--bg2) 25%, var(--card) 50%, var(--bg2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .link-preview { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
@@ -55,15 +45,15 @@
         .link-preview-title { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1rem; color: var(--text); }
         .link-preview-desc { font-size: 0.82rem; color: var(--text2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
+        /* Toasts */
         .toast-container { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 0.8rem 1.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; font-size: 0.88rem; animation: slideIn 0.4s ease, fadeOut 0.4s ease 2.6s forwards; }
         @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; } }
 
+        /* Scrollbars */
         .modal-content::-webkit-scrollbar { width: 4px; }
         .modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        
-        /* Pages horizontal scroll hide */
         #pagesContainer::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -76,12 +66,12 @@
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <h2 class="font-display font-bold text-2xl mb-2">Welcome to LinkVibe</h2>
-            <p class="text-sm text-gray-500 mb-6">Post karne ke liye login karna zaroori hai.</p>
+            <p class="text-sm text-gray-500 mb-6">Aage barhne ke liye login karein.</p>
             <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white border-2 border-gray-200 hover:bg-gray-50 transition font-medium">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:24px;">
                 Continue with Google
             </button>
-            <button onclick="closeLoginModal()" class="mt-4 text-sm text-gray-400 hover:text-gray-600">Baad mein karunga</button>
+            <button onclick="window.closeLoginModal()" class="mt-4 text-sm text-gray-400 hover:text-gray-600">Cancel</button>
         </div>
     </div>
 
@@ -158,43 +148,11 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-content" style="max-width: 450px; text-align: left;">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="font-display font-bold text-2xl">Settings</h2>
-                <button onclick="document.getElementById('settingsModal').classList.remove('open')" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="mb-6">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Account Info</h3>
-                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <div class="text-xs text-gray-500 mb-1">Registered Email</div>
-                    <div class="text-gray-800 font-medium text-sm" id="settingsEmail">Loading...</div>
-                </div>
-            </div>
-            <div class="mb-6">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Preferences</h3>
-                <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4 border border-gray-200">
-                    <span class="text-gray-800 font-medium text-sm">Email Notifications</span>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-                    </label>
-                </div>
-            </div>
-            <button onclick="window.saveSettings()" class="w-full bg-gradient-to-r from-blue-500 to-blue-400 hover:shadow-lg text-white font-semibold py-3 rounded-xl transition transform hover:-translate-y-0.5">
-                Save Settings
-            </button>
-        </div>
-    </div>
-
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="max-w-3xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.closePageView()">
                     <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;">
                         <i class="fas fa-link text-white text-sm"></i>
                     </div>
@@ -214,9 +172,6 @@
                     <button onclick="window.openCreatePageModal()" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
                         <i class="fas fa-flag text-teal-500 w-4 text-center"></i> Create Page
                     </button>
-                    <button onclick="window.openSettingsModal()" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
-                        <i class="fas fa-cog text-blue-500 w-4 text-center"></i> Settings
-                    </button>
                     <hr class="my-1 border-gray-100">
                     <button id="logoutBtn" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-red-50 text-red-500">
                         <i class="fas fa-sign-out-alt w-4 text-center"></i> Logout
@@ -228,18 +183,49 @@
 
     <main class="max-w-3xl mx-auto px-4 py-6">
         
-        <!-- Post Creator -->
-        <div class="card p-5 mb-6">
+        <!-- NEW: LinkedIn Style Page Header (Hidden on Home) -->
+        <div id="activePageHeader" class="hidden mb-6 card overflow-hidden relative">
+            <button onclick="window.closePageView()" class="absolute top-4 left-4 z-20 bg-white text-gray-800 p-2 w-10 h-10 rounded-full shadow-md hover:bg-gray-50 transition flex items-center justify-center">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div id="viewPageCover" class="h-48 w-full bg-cover bg-center bg-gray-200 relative">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            </div>
+            <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center sm:items-start sm:flex-row gap-5">
+                <img id="viewPageLogo" class="w-28 h-28 rounded-full border-4 border-white object-cover shadow-md bg-white relative z-10">
+                <div class="mt-2 sm:mt-14 text-center sm:text-left flex-1">
+                    <h1 id="viewPageName" class="font-display font-bold text-2xl text-gray-900"></h1>
+                    <p id="viewPageCategory" class="text-sm font-medium text-orange-500 mb-2"></p>
+                    <p id="viewPageDesc" class="text-sm text-gray-600 max-w-xl leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="px-6 pb-4 border-t border-gray-100 pt-3 flex gap-4">
+                 <span class="text-sm font-medium text-teal-600 bg-teal-50 px-3 py-1 rounded-full"><i class="fas fa-check-circle"></i> Official Page</span>
+            </div>
+        </div>
+
+        <!-- My Pages Section (Hidden in Page View) -->
+        <div id="myPagesSection" class="hidden mb-6">
+            <h3 class="font-display font-bold text-lg mb-3 text-gray-800">My Pages</h3>
+            <div id="pagesContainer" class="flex gap-4 overflow-x-auto pb-4">
+                <!-- User's Pages Render Here -->
+            </div>
+        </div>
+
+        <!-- Smart Post Creator (Adapts to User or Page) -->
+        <div class="card p-5 mb-6" id="postCreatorCard">
             <div class="flex items-start gap-3">
-                <img id="currentUserAvatar" src="https://ui-avatars.com/api/?name=Guest&background=random" class="avatar" alt="You">
+                <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Guest&background=random" class="avatar" alt="Author">
                 <div style="flex:1;">
                     <div contenteditable="true" id="postText" class="outline-none min-h-[44px] py-2 text-[0.95rem] text-gray-800" data-placeholder="Kya share karna chahte ho?"></div>
+                    
                     <div class="link-bar flex items-center gap-3 p-3 mt-2">
                         <i class="fas fa-link text-orange-500 text-sm"></i>
                         <input type="text" id="linkInput" placeholder="Yahan link paste karo..." oninput="window.handleLinkInput(this.value)">
                         <button id="clearLinkBtn" class="hidden text-gray-400 hover:text-gray-600" onclick="window.clearLink()"><i class="fas fa-times"></i></button>
                     </div>
                     <div id="linkPreviewArea" style="display:none;margin-top:12px;"></div>
+                    
                     <div id="imagePreviewArea" style="display:none; margin-top:12px; position:relative;">
                         <img id="uploadedImage" src="" style="width:100%; max-height:300px; object-fit:cover; border-radius:16px; border:1px solid var(--border);">
                         <button onclick="window.clearImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">
@@ -247,6 +233,7 @@
                         </button>
                     </div>
                     <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
+                    
                     <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                         <div class="flex items-center gap-1">
                             <button onclick="document.getElementById('imageInput').click()" class="p-2 rounded-lg text-teal-500 hover:bg-teal-50 transition" title="Photo">
@@ -261,15 +248,8 @@
             </div>
         </div>
 
-        <!-- NEW: My Pages Section (Visible only if user has created pages) -->
-        <div id="myPagesSection" class="hidden mb-6">
-            <h3 class="font-display font-bold text-lg mb-3 text-gray-800">My Pages</h3>
-            <div id="pagesContainer" class="flex gap-4 overflow-x-auto pb-4">
-                <!-- Pages will render here -->
-            </div>
-        </div>
-
         <!-- Feed Container -->
+        <h3 id="feedTitle" class="font-display font-bold text-lg mb-3 text-gray-800">Global Feed</h3>
         <div id="feedContainer">
             <div class="text-center text-gray-400 py-10">Loading posts...</div>
         </div>
@@ -297,7 +277,16 @@
             db = getFirestore(app);
         } catch(e) { console.warn("Firebase config error:", e); }
 
+        // ==========================================
+        // GLOBAL STATE
+        // ==========================================
         let currentUser = null; 
+        let myPagesArray = []; 
+        let allPostsArray = [];
+        
+        // Context Track karta hai ke hum User hain ya Page
+        let currentContext = { type: 'home', id: null, data: null }; 
+
         let isPreviewLoading = false;
         let previewTimeout;
         let currentLinkPreview = null;
@@ -305,19 +294,57 @@
         let pageLogoData = null;
         let pageCoverData = null;
 
-        document.getElementById('chatPublicBtn').addEventListener('click', () => {
-            showToast("Chat Public ka feature jald aa raha hai!", "info");
-        });
+        document.getElementById('chatPublicBtn').addEventListener('click', () => { showToast("Chat Public ka feature jald aa raha hai!", "info"); });
 
         // ==========================================
-        // PAGE CREATION & DISPLAY LOGIC
+        // VIEW NAVIGATION (HOME vs PAGE)
+        // ==========================================
+        window.openPageView = function(pageId) {
+            const pageData = myPagesArray.find(p => p.id === pageId);
+            if(!pageData) return;
+
+            currentContext = { type: 'page', id: pageId, data: pageData };
+            
+            // UI Update for Page View
+            document.getElementById('myPagesSection').classList.add('hidden');
+            document.getElementById('activePageHeader').classList.remove('hidden');
+            
+            document.getElementById('viewPageCover').style.backgroundImage = `url('${pageData.cover || ''}')`;
+            document.getElementById('viewPageLogo').src = pageData.logo;
+            document.getElementById('viewPageName').textContent = pageData.name;
+            document.getElementById('viewPageCategory').textContent = pageData.category;
+            document.getElementById('viewPageDesc').textContent = pageData.description || "No description provided.";
+            
+            // Post Creator Adapts to Page
+            document.getElementById('creatorAvatar').src = pageData.logo;
+            document.getElementById('postText').setAttribute('data-placeholder', `Post as ${pageData.name}...`);
+            document.getElementById('feedTitle').textContent = `${pageData.name}'s Posts`;
+
+            window.renderFeed(); // Re-render feed (Filtered)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.closePageView = function() {
+            currentContext = { type: 'home', id: null, data: null };
+            
+            // UI Update for Home View
+            if(myPagesArray.length > 0) document.getElementById('myPagesSection').classList.remove('hidden');
+            document.getElementById('activePageHeader').classList.add('hidden');
+            
+            // Post Creator Reverts to User
+            if(currentUser) document.getElementById('creatorAvatar').src = currentUser.photo || currentUser.photoURL;
+            document.getElementById('postText').setAttribute('data-placeholder', "Kya share karna chahte ho?");
+            document.getElementById('feedTitle').textContent = "Global Feed";
+
+            window.renderFeed(); // Re-render feed (All posts)
+        };
+
+        // ==========================================
+        // PAGE CREATION LOGIC
         // ==========================================
         window.openCreatePageModal = () => {
             document.getElementById('profileMenu').style.display = 'none';
-            if(!currentUser) {
-                showToast("Page banane ke liye pehle login karein!", "error");
-                return window.openLoginModal();
-            }
+            if(!currentUser) { showToast("Pehle login karein!", "error"); return window.openLoginModal(); }
             document.getElementById('createPageModal').classList.add('open');
         };
 
@@ -325,8 +352,7 @@
             const file = event.target.files[0];
             if (!file) return;
             resizeImage(file, 400, 400, (resizedData) => {
-                pageLogoData = resizedData;
-                document.getElementById('pageLogoPreview').src = resizedData;
+                pageLogoData = resizedData; document.getElementById('pageLogoPreview').src = resizedData;
             });
         };
 
@@ -336,8 +362,7 @@
             resizeImage(file, 800, 400, (resizedData) => {
                 pageCoverData = resizedData;
                 const coverImg = document.getElementById('pageCoverPreview');
-                coverImg.src = resizedData;
-                coverImg.classList.remove('hidden');
+                coverImg.src = resizedData; coverImg.classList.remove('hidden');
             });
         };
 
@@ -345,7 +370,6 @@
             const name = document.getElementById('pageNameInput').value.trim();
             const category = document.getElementById('pageCategoryInput').value;
             const desc = document.getElementById('pageDescInput').value.trim();
-
             if(!name) return showToast("Page ka naam likhna zaroori hai!", "error");
 
             try {
@@ -353,72 +377,73 @@
                     name: name, category: category, description: desc,
                     logo: pageLogoData || "https://ui-avatars.com/api/?name=" + name + "&background=random",
                     cover: pageCoverData || null,
-                    adminUid: currentUser.uid, followers: 0,
+                    adminUid: currentUser.uid,
                     createdAt: serverTimestamp()
                 };
 
                 await addDoc(collection(db, "pages"), pageData);
                 document.getElementById('createPageModal').classList.remove('open');
                 
-                document.getElementById('pageNameInput').value = '';
-                document.getElementById('pageDescInput').value = '';
+                document.getElementById('pageNameInput').value = ''; document.getElementById('pageDescInput').value = '';
                 pageLogoData = null; pageCoverData = null;
                 document.getElementById('pageLogoPreview').src = "https://ui-avatars.com/api/?name=P&background=f4f4f5&color=a1a1aa";
                 document.getElementById('pageCoverPreview').classList.add('hidden');
-
-                showToast("Mubarak ho! Aapka page ban gaya.", "success");
-            } catch(e) { showToast("Error creating page: " + e.message, "error"); }
+                showToast("Page ban gaya!", "success");
+            } catch(e) { showToast("Error: " + e.message, "error"); }
         }
 
-        // Fetch user's pages
         function loadMyPages() {
             if(!db || !currentUser) return;
-            // Fetch pages where adminUid matches current user
             const q = query(collection(db, "pages"), where("adminUid", "==", currentUser.uid));
             onSnapshot(q, (snapshot) => {
                 const section = document.getElementById('myPagesSection');
                 const container = document.getElementById('pagesContainer');
                 container.innerHTML = '';
+                myPagesArray = [];
                 
                 if(snapshot.empty) {
-                    section.classList.add('hidden');
+                    if(currentContext.type === 'home') section.classList.add('hidden');
                     return;
                 }
                 
-                section.classList.remove('hidden');
                 snapshot.forEach((doc) => {
-                    const page = doc.data();
+                    const page = { id: doc.id, ...doc.data() };
+                    myPagesArray.push(page);
                     container.innerHTML += `
-                        <div class="card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition border-gray-100 relative overflow-hidden">
+                        <div onclick="window.openPageView('${page.id}')" class="card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition border-gray-100 relative overflow-hidden group">
                             ${page.cover ? `<div class="absolute top-0 left-0 w-full h-12 bg-cover bg-center" style="background-image: url('${page.cover}')"></div>` : `<div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-orange-200 to-orange-100"></div>`}
-                            <img src="${page.logo}" class="w-16 h-16 rounded-full object-cover mt-4 mb-2 border-2 border-white relative z-10 shadow-sm">
+                            <img src="${page.logo}" class="w-16 h-16 rounded-full object-cover mt-4 mb-2 border-2 border-white relative z-10 shadow-sm group-hover:scale-105 transition">
                             <h4 class="font-bold text-sm text-gray-800 truncate w-full relative z-10">${page.name}</h4>
                             <p class="text-[0.65rem] text-gray-400 relative z-10">${page.category}</p>
                         </div>
                     `;
                 });
+                
+                if(currentContext.type === 'home' && myPagesArray.length > 0) {
+                    section.classList.remove('hidden');
+                }
             });
         }
 
         // ==========================================
-        // AUTHENTICATION & USER PROFILE LOGIC
+        // AUTH & PROFILE
         // ==========================================
         const provider = new GoogleAuthProvider();
-
         document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            if(!auth) return showToast("Firebase configure nahi hai!", "error");
+            if(!auth) return showToast("Firebase error", "error");
             try {
                 const result = await signInWithPopup(auth, provider);
-                closeLoginModal();
+                window.closeLoginModal();
                 await checkAndCreateProfile(result.user);
-            } catch (error) { showToast("Login Failed: " + error.message, "error"); }
+            } catch (error) { showToast("Login Failed", "error"); }
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if(auth) signOut(auth);
             document.getElementById('profileMenu').style.display = 'none';
             document.getElementById('myPagesSection').classList.add('hidden');
-            showToast("Logged out successfully.", "info");
+            window.closePageView();
+            showToast("Logged out.", "info");
         });
 
         async function checkAndCreateProfile(firebaseUser) {
@@ -429,17 +454,14 @@
                 document.getElementById('profileSetupModal').classList.add('open');
             } else {
                 currentUser = { ...firebaseUser, ...docSnap.data() };
-                updateNavbarUI(currentUser);
-                loadMyPages(); // Load pages after login
-                showToast("Welcome back!", "success");
+                updateNavbarUI(currentUser); loadMyPages();
             }
         }
 
         document.getElementById('saveProfileBtn').addEventListener('click', async () => {
             const handle = document.getElementById('usernameInput').value.trim();
             const bio = document.getElementById('bioInput').value.trim();
-            if(!handle) return showToast("Username likhna zaroori hai!", "error");
-
+            if(!handle) return showToast("Username zaroori hai!", "error");
             try {
                 const newUserData = {
                     name: auth.currentUser.displayName, email: auth.currentUser.email,
@@ -448,11 +470,10 @@
                 };
                 await setDoc(doc(db, "users", auth.currentUser.uid), newUserData, { merge: true });
                 document.getElementById('profileSetupModal').classList.remove('open');
-                showToast("Profile successfully save ho gayi!", "success");
+                showToast("Profile saved!", "success");
                 currentUser = { ...auth.currentUser, ...newUserData };
-                updateNavbarUI(currentUser);
-                loadMyPages(); // Load pages after profile save
-            } catch(e) { showToast("Error saving profile: " + e.message, "error"); }
+                updateNavbarUI(currentUser); loadMyPages();
+            } catch(e) { showToast("Error", "error"); }
         });
 
         if(auth) {
@@ -465,34 +486,28 @@
                         updateNavbarUI(currentUser);
                         document.getElementById('usernameInput').value = currentUser.handle.replace('@', '');
                         document.getElementById('bioInput').value = currentUser.bio || '';
-                        loadMyPages(); // Load pages for existing user
+                        loadMyPages();
                     } else {
-                        currentUser = user; 
-                        document.getElementById('profileSetupModal').classList.add('open');
-                        updateNavbarUI(user);
+                        currentUser = user; document.getElementById('profileSetupModal').classList.add('open'); updateNavbarUI(user);
                     }
-                } else {
-                    currentUser = null; updateNavbarUI(null);
-                    document.getElementById('myPagesSection').classList.add('hidden');
-                }
+                } else { currentUser = null; updateNavbarUI(null); window.closePageView(); }
             });
         }
 
         function updateNavbarUI(user) {
             const section = document.getElementById('userProfileSection');
-            const avatar = document.getElementById('currentUserAvatar');
             if(user) {
                 const photo = user.photo || user.photoURL || "https://ui-avatars.com/api/?name=U&background=random";
                 section.innerHTML = `<img src="${photo}" class="avatar cursor-pointer" onclick="window.toggleMenu()">`;
-                avatar.src = photo;
+                if(currentContext.type === 'home') document.getElementById('creatorAvatar').src = photo;
             } else {
                 section.innerHTML = `<button onclick="window.openLoginModal()" class="text-sm font-semibold bg-orange-100 text-orange-600 px-4 py-2 rounded-xl">Log In</button>`;
-                avatar.src = "https://ui-avatars.com/api/?name=Guest&background=random";
+                document.getElementById('creatorAvatar').src = "https://ui-avatars.com/api/?name=Guest&background=random";
             }
         }
 
         // ==========================================
-        // HELPER: IMAGE RESIZER (Optimized for Firestore)
+        // SMART POST CREATOR (USER OR PAGE)
         // ==========================================
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
@@ -500,16 +515,10 @@
                 const img = new Image();
                 img.onload = function() {
                     let width = img.width; let height = img.height;
-                    if (width > height) {
-                        if (width > maxWidth) { height = Math.round(height *= maxWidth / width); width = maxWidth; }
-                    } else {
-                        if (height > maxHeight) { width = Math.round(width *= maxHeight / height); height = maxHeight; }
-                    }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    // Reduced quality to 0.6 to prevent Firestore 1MB document size limits
+                    if (width > height) { if (width > maxWidth) { height = Math.round(height *= maxWidth / width); width = maxWidth; } } 
+                    else { if (height > maxHeight) { width = Math.round(width *= maxHeight / height); height = maxHeight; } }
+                    const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
                     callback(canvas.toDataURL('image/jpeg', 0.6));
                 };
                 img.src = e.target.result;
@@ -517,78 +526,32 @@
             reader.readAsDataURL(file);
         }
 
-        // ==========================================
-        // LINK PREVIEW LOGIC
-        // ==========================================
         window.handleLinkInput = function(value) {
-            const clearBtn = document.getElementById('clearLinkBtn');
-            const previewArea = document.getElementById('linkPreviewArea');
+            const clearBtn = document.getElementById('clearLinkBtn'); const previewArea = document.getElementById('linkPreviewArea');
             clearTimeout(previewTimeout);
-
-            if (value.trim() === '') {
-                clearBtn.classList.add('hidden'); previewArea.style.display = 'none';
-                currentLinkPreview = null; isPreviewLoading = false; window.updatePostBtn(); return;
-            }
-
+            if (value.trim() === '') { clearBtn.classList.add('hidden'); previewArea.style.display = 'none'; currentLinkPreview = null; isPreviewLoading = false; window.updatePostBtn(); return; }
             clearBtn.classList.remove('hidden');
-            const urlPattern = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
-            
-            if (urlPattern.test(value.trim())) {
+            if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(value.trim())) {
                 isPreviewLoading = true; window.updatePostBtn();
-                previewArea.style.display = 'block';
-                previewArea.innerHTML = `<div class="link-preview pointer-events-none"><div class="shimmer" style="height:150px;"></div><div class="p-3"><div class="shimmer h-3 w-20 rounded mb-2"></div><div class="shimmer h-4 w-full rounded"></div></div></div>`;
-
+                previewArea.style.display = 'block'; previewArea.innerHTML = `<div class="link-preview pointer-events-none"><div class="shimmer" style="height:150px;"></div><div class="p-3"><div class="shimmer h-3 w-20 rounded mb-2"></div><div class="shimmer h-4 w-full rounded"></div></div></div>`;
                 previewTimeout = setTimeout(() => {
                     const domain = value.trim().replace(/^https?:\/\//, '').split('/')[0];
-                    currentLinkPreview = {
-                        url: value.trim(), domain: domain, title: "Shared Web Link", desc: "Click to visit this resource.",
-                        image: `https://picsum.photos/seed/${domain}/600/300.jpg`
-                    };
+                    currentLinkPreview = { url: value.trim(), domain: domain, title: "Shared Web Link", desc: "Click to visit this resource.", image: `https://picsum.photos/seed/${domain}/600/300.jpg` };
                     previewArea.innerHTML = `<div class="link-preview" onclick="window.open('${currentLinkPreview.url}', '_blank')"><img src="${currentLinkPreview.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${domain}</div><div class="link-preview-title">${currentLinkPreview.title}</div></div></div>`;
                     isPreviewLoading = false; window.updatePostBtn();
                 }, 800);
             }
         };
 
-        window.clearLink = function() {
-            document.getElementById('linkInput').value = ''; document.getElementById('linkPreviewArea').style.display = 'none';
-            document.getElementById('clearLinkBtn').classList.add('hidden');
-            currentLinkPreview = null; isPreviewLoading = false; clearTimeout(previewTimeout); window.updatePostBtn();
-        };
-
-        // ==========================================
-        // POST IMAGE UPLOAD LOGIC
-        // ==========================================
-        window.handleImageUpload = function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            resizeImage(file, 600, 600, (resizedData) => {
-                currentImagePreview = resizedData;
-                document.getElementById('uploadedImage').src = resizedData;
-                document.getElementById('imagePreviewArea').style.display = 'block';
-                window.clearLink(); window.updatePostBtn();
-            });
-        };
-
-        window.clearImage = function() {
-            document.getElementById('imageInput').value = ''; document.getElementById('imagePreviewArea').style.display = 'none';
-            currentImagePreview = null; window.updatePostBtn();
-        };
-
-        // ==========================================
-        // POST CREATION LOGIC
-        // ==========================================
-        window.updatePostBtn = function() {
-            const text = document.getElementById('postText').textContent.trim();
-            const hasMedia = currentLinkPreview !== null || currentImagePreview !== null;
-            document.getElementById('postBtn').disabled = !((text.length > 0 || hasMedia) && !isPreviewLoading);
-        };
-
+        window.clearLink = function() { document.getElementById('linkInput').value = ''; document.getElementById('linkPreviewArea').style.display = 'none'; document.getElementById('clearLinkBtn').classList.add('hidden'); currentLinkPreview = null; isPreviewLoading = false; clearTimeout(previewTimeout); window.updatePostBtn(); };
+        window.handleImageUpload = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 600, 600, (resizedData) => { currentImagePreview = resizedData; document.getElementById('uploadedImage').src = resizedData; document.getElementById('imagePreviewArea').style.display = 'block'; window.clearLink(); window.updatePostBtn(); }); };
+        window.clearImage = function() { document.getElementById('imageInput').value = ''; document.getElementById('imagePreviewArea').style.display = 'none'; currentImagePreview = null; window.updatePostBtn(); };
+        window.updatePostBtn = function() { const text = document.getElementById('postText').textContent.trim(); const hasMedia = currentLinkPreview !== null || currentImagePreview !== null; document.getElementById('postBtn').disabled = !((text.length > 0 || hasMedia) && !isPreviewLoading); };
         document.getElementById('postText').addEventListener('input', window.updatePostBtn);
 
         window.createPost = async function() {
             if(!currentUser) return window.openLoginModal();
-            if(!currentUser.handle) {
+            if(!currentUser.handle && currentContext.type === 'home') {
                 document.getElementById('profileSetupModal').classList.add('open');
                 return showToast("Pehle apna username select karein!", "info");
             }
@@ -596,10 +559,16 @@
             const text = document.getElementById('postText').textContent.trim();
             document.getElementById('postBtn').disabled = true;
 
+            // DYNAMIC POSTING DATA based on context
+            const isPagePost = currentContext.type === 'page';
             const postData = {
-                text: text, author: currentUser.name || currentUser.displayName,
-                authorHandle: currentUser.handle, authorPic: currentUser.photo || currentUser.photoURL,
-                link: currentLinkPreview || null, image: currentImagePreview || null,
+                text: text,
+                author: isPagePost ? currentContext.data.name : (currentUser.name || currentUser.displayName),
+                authorHandle: isPagePost ? currentContext.data.category : currentUser.handle,
+                authorPic: isPagePost ? currentContext.data.logo : (currentUser.photo || currentUser.photoURL),
+                pageId: isPagePost ? currentContext.id : null, // Tag post with page ID
+                link: currentLinkPreview || null, 
+                image: currentImagePreview || null,
                 createdAt: serverTimestamp()
             };
 
@@ -607,53 +576,57 @@
                 try {
                     await addDoc(collection(db, "posts"), postData);
                     showToast("Post Live Ho Gayi!", "success");
-                    resetForm();
-                } catch(e) {
-                    showToast("Post fail: " + e.message, "error");
-                    window.updatePostBtn();
-                }
+                    document.getElementById('postText').textContent = '';
+                    window.clearLink(); window.clearImage();
+                } catch(e) { showToast("Post fail: " + e.message, "error"); window.updatePostBtn(); }
             }
         };
 
-        function resetForm() {
-            document.getElementById('postText').textContent = '';
-            window.clearLink(); window.clearImage();
-        }
-
         // ==========================================
-        // FETCH & RENDER POSTS
+        // SMART FEED (FILTERED)
         // ==========================================
         if(db) {
             const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
-                const container = document.getElementById('feedContainer');
-                container.innerHTML = '';
-                
-                if(snapshot.empty) {
-                    container.innerHTML = '<div class="text-center text-gray-400 py-10">Koi post nahi mili.</div>';
-                    return;
-                }
+                allPostsArray = [];
                 snapshot.forEach((doc) => {
-                    const post = doc.data();
-                    // Old bad data fix
-                    if(!post.author || post.author === 'undefined') return;
-                    container.innerHTML += buildPostHTML(post);
+                    const data = doc.data();
+                    if(data.author && data.author !== 'undefined') allPostsArray.push({id: doc.id, ...data});
                 });
+                window.renderFeed();
             });
         }
 
-        function buildPostHTML(post) {
-            let mediaHTML = '';
-            if(post.link) {
-                mediaHTML = `<div class="link-preview mt-3" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${post.link.domain}</div><div class="link-preview-title">${post.link.title}</div></div></div>`;
-            } else if(post.image) {
-                mediaHTML = `<img src="${post.image}" class="mt-3 w-full max-h-80 object-cover rounded-xl border border-gray-200">`;
+        window.renderFeed = function() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '';
+            
+            // Filter logic
+            let postsToShow = allPostsArray;
+            if(currentContext.type === 'page') {
+                postsToShow = allPostsArray.filter(p => p.pageId === currentContext.id);
             }
 
-            const handleDisplay = post.authorHandle && post.authorHandle !== 'undefined' ? `<div class="text-[0.78rem] text-gray-400">${post.authorHandle}</div>` : `<div class="text-[0.78rem] text-gray-400">Just Now</div>`;
-            const textDisplay = post.text && post.text !== 'undefined' ? post.text : '';
+            if(postsToShow.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-400 py-10">Koi post nahi mili.</div>';
+                return;
+            }
 
-            return `<article class="card p-5 mb-4 animation-fadeIn"><div class="flex items-center gap-3 mb-3"><img src="${post.authorPic}" class="avatar"><div><div class="font-bold text-[0.95rem] font-display">${post.author}</div>${handleDisplay}</div></div><p class="text-[0.92rem] leading-relaxed text-gray-800">${textDisplay}</p>${mediaHTML}</article>`;
+            postsToShow.forEach((post) => {
+                let mediaHTML = '';
+                if(post.link) {
+                    mediaHTML = `<div class="link-preview mt-3" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${post.link.domain}</div><div class="link-preview-title">${post.link.title}</div></div></div>`;
+                } else if(post.image) {
+                    mediaHTML = `<img src="${post.image}" class="mt-3 w-full max-h-80 object-cover rounded-xl border border-gray-200">`;
+                }
+                const handleDisplay = post.authorHandle && post.authorHandle !== 'undefined' ? `<div class="text-[0.78rem] text-gray-400">${post.authorHandle}</div>` : `<div class="text-[0.78rem] text-gray-400">Just Now</div>`;
+                const textDisplay = post.text && post.text !== 'undefined' ? post.text : '';
+
+                // Show a small badge if it's a page post appearing in the global feed
+                const pageBadge = (currentContext.type === 'home' && post.pageId) ? `<i class="fas fa-check-circle text-teal-500 text-xs ml-1" title="Official Page"></i>` : '';
+
+                container.innerHTML += `<article class="card p-5 mb-4 animation-fadeIn"><div class="flex items-center gap-3 mb-3"><img src="${post.authorPic}" class="avatar"><div><div class="font-bold text-[0.95rem] font-display flex items-center">${post.author} ${pageBadge}</div>${handleDisplay}</div></div><p class="text-[0.92rem] leading-relaxed text-gray-800 whitespace-pre-wrap">${textDisplay}</p>${mediaHTML}</article>`;
+            });
         }
 
         // ==========================================
@@ -662,8 +635,6 @@
         window.openLoginModal = () => document.getElementById('loginModal').classList.add('open');
         window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('open');
         window.openProfileModal = () => { document.getElementById('profileMenu').style.display = 'none'; if(!currentUser) return window.openLoginModal(); document.getElementById('profileSetupModal').classList.add('open'); };
-        window.openSettingsModal = () => { document.getElementById('profileMenu').style.display = 'none'; document.getElementById('settingsEmail').textContent = (currentUser && currentUser.email) ? currentUser.email : "Not Logged In"; document.getElementById('settingsModal').classList.add('open'); };
-        window.saveSettings = () => { document.getElementById('settingsModal').classList.remove('open'); showToast("Settings update ho gayin!", "success"); };
         window.toggleMenu = () => { const m = document.getElementById('profileMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; };
         function showToast(message, type = 'info') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast`; const icon = type === 'success' ? 'fa-check-circle text-teal-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-orange-500'; toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
     </script>

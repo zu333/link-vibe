@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkVibe — Social Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #FFF8F3; --bg2: #FFF1E8; --card: #FFFFFF;
+            --accent: #E8613C; --accent2: #F4A261; --accent3: #2EC4B6;
+            --text: #2D2A32; --text2: #6B6574; --muted: #B0A9B9;
+            --border: #F0E6DE; --success: #2EC4B6; --danger: #E76F51;
+            --shadow: 0 4px 24px rgba(232, 97, 60, 0.08);
+            --shadow-hover: 0 8px 32px rgba(232, 97, 60, 0.14);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Outfit', sans-serif; }
+
+        /* Navbar & Avatars */
+        .navbar { position: sticky; top: 0; z-index: 100; background: rgba(255, 248, 243, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; transition: box-shadow 0.3s; }
+        .navbar.scrolled { box-shadow: 0 2px 20px rgba(232, 97, 60, 0.08); }
+        .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); transition: border-color 0.3s; }
+        .avatar:hover { border-color: var(--accent); }
+        .avatar-sm { width: 34px; height: 34px; } .avatar-lg { width: 56px; height: 56px; }
+
+        /* Cards & Inputs */
+        .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        .link-bar { background: var(--card); border-radius: 20px; border: 2px dashed var(--border); overflow: hidden; }
+        .link-bar:focus-within { border-color: var(--accent); border-style: solid; box-shadow: 0 0 0 4px rgba(232, 97, 60, 0.1); }
+        .link-bar input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
+        
+        .btn-post { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 14px; padding: 0.6rem 1.5rem; font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(45, 42, 50, 0.6); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--card); border-radius: 24px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.3s; text-align: center; }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+        
+        /* Shimmer & Link Previews */
+        .shimmer { background: linear-gradient(90deg, var(--bg2) 25%, var(--card) 50%, var(--bg2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .link-preview { background: var(--bg2); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
+        .link-preview-img { width: 100%; height: 180px; object-fit: cover; }
+        .link-preview-title { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 1rem; color: var(--text); }
+        .link-preview-desc { font-size: 0.82rem; color: var(--text2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Toasts */
+        .toast-container { position: fixed; top: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 0.8rem 1.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; font-size: 0.88rem; animation: slideIn 0.4s ease, fadeOut 0.4s ease 2.6s forwards; }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <h2 class="font-display font-bold text-2xl mb-2">Welcome to LinkVibe</h2>
+            <p class="text-sm text-gray-500 mb-6">Post karne ke liye login karna zaroori hai.</p>
+            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white border-2 border-gray-200 hover:bg-gray-50 transition font-medium">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:24px;">
+                Continue with Google
+            </button>
+            <button onclick="closeLoginModal()" class="mt-4 text-sm text-gray-400 hover:text-gray-600">Baad mein karunga</button>
+        </div>
+    </div>
+
+    <!-- Profile Setup (Create User) Modal -->
+    <div class="modal-overlay" id="profileSetupModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 class="font-display font-bold text-2xl mb-2">Create Your Profile</h2>
+            <p class="text-sm text-gray-500 mb-6">LinkVibe par apni nayi pehchan banayein!</p>
+            
+            <div class="text-left mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Username (Handle)</label>
+                <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 focus-within:border-orange-500 transition">
+                    <span class="text-gray-400 mr-1">@</span>
+                    <input type="text" id="usernameInput" class="bg-transparent outline-none w-full text-sm text-gray-800" placeholder="ali_dev">
+                </div>
+            </div>
+            
+            <div class="text-left mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Bio (Optional)</label>
+                <textarea id="bioInput" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none text-sm text-gray-800 focus:border-orange-500 transition" placeholder="Apne bare mein kuch alfaz..."></textarea>
+            </div>
+            
+            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:shadow-lg text-white font-semibold py-3 rounded-xl transition transform hover:-translate-y-0.5">
+                Save Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+            
+            <!-- Left Side: Logo & Chat Option -->
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-3">
+                    <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-link text-white text-sm"></i>
+                    </div>
+                    <span class="logo">LinkVibe</span>
+                </div>
+                
+                <!-- Naya: Chat Public Placeholder Button -->
+                <button id="chatPublicBtn" class="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-500 transition px-3 py-1.5 rounded-lg hover:bg-orange-50">
+                    <i class="fas fa-comments text-orange-400"></i> Chat Public
+                </button>
+            </div>
+            
+            <!-- Right Side: User Profile / Login -->
+            <div class="flex items-center gap-3 relative">
+                <div id="userProfileSection">
+                    <!-- Firebase injects user avatar here -->
+                </div>
+                
+                <div id="profileMenu" style="display:none;position:absolute;top:52px;right:0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:180px;z-index:50;">
+                    <a href="#" class="flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700"><i class="fas fa-cog text-blue-500 w-5"></i> Settings</a>
+                    <hr class="my-1 border-gray-100">
+                    <button id="logoutBtn" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-red-50 text-red-500"><i class="fas fa-sign-out-alt w-5"></i> Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-3xl mx-auto px-4 py-6">
+        <!-- Post Creator -->
+        <div class="card p-5 mb-6">
+            <div class="flex items-start gap-3">
+                <img id="currentUserAvatar" src="https://ui-avatars.com/api/?name=Guest&background=random" class="avatar" alt="You">
+                <div style="flex:1;">
+                    <div contenteditable="true" id="postText" class="outline-none min-h-[44px] py-2 text-[0.95rem] text-gray-800" data-placeholder="Kya share karna chahte ho?"></div>
+
+                    <!-- Link Input Bar -->
+                    <div class="link-bar flex items-center gap-3 p-3 mt-2">
+                        <i class="fas fa-link text-orange-500 text-sm"></i>
+                        <input type="text" id="linkInput" placeholder="Yahan link paste karo..." oninput="window.handleLinkInput(this.value)">
+                        <button id="clearLinkBtn" class="hidden text-gray-400 hover:text-gray-600" onclick="window.clearLink()"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <!-- Link Preview Area -->
+                    <div id="linkPreviewArea" style="display:none;margin-top:12px;"></div>
+
+                    <!-- Image Preview Area -->
+                    <div id="imagePreviewArea" style="display:none; margin-top:12px; position:relative;">
+                        <img id="uploadedImage" src="" style="width:100%; max-height:300px; object-fit:cover; border-radius:16px; border:1px solid var(--border);">
+                        <button onclick="window.clearImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <!-- Hidden File Input -->
+                    <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
+
+                    <!-- Action Bar -->
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                        <div class="flex items-center gap-1">
+                            <button onclick="document.getElementById('imageInput').click()" class="p-2 rounded-lg text-teal-500 hover:bg-teal-50 transition" title="Photo">
+                                <i class="fas fa-image text-lg"></i>
+                            </button>
+                        </div>
+                        <button class="btn-post" id="postBtn" onclick="window.createPost()" disabled>
+                            <i class="fas fa-paper-plane mr-1"></i> Post
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed Container -->
+        <div id="feedContainer">
+            <div class="text-center text-gray-400 py-10">Loading posts...</div>
+        </div>
+    </main>
+
+    <!-- Firebase JS SDK (ES Modules via CDN) -->
+    <script type="module">
+        // 1. Firebase Core
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        // 2. Firebase Auth
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // 3. Firestore (Database)
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // ==========================================
+        // FIREBASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt1Ovfnj8MuAf2zddjH9ShdKfQyX9vcMA",
+            authDomain: "friends-tea.firebaseapp.com",
+            projectId: "friends-tea",
+            storageBucket: "friends-tea.firebasestorage.app",
+            messagingSenderId: "489214702390",
+            appId: "1:489214702390:web:6a07c74a4863e08c5a3997"
+        };
+
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch(e) {
+            console.warn("Firebase config error:", e);
+        }
+
+        // ==========================================
+        // GLOBAL VARIABLES
+        // ==========================================
+        let currentUser = null; 
+        let isPreviewLoading = false;
+        let previewTimeout;
+        let currentLinkPreview = null;
+        let currentImagePreview = null;
+
+        // ==========================================
+        // CHAT PUBLIC LOGIC (Yahan baad mein code paste karna hai)
+        // ==========================================
+        document.getElementById('chatPublicBtn').addEventListener('click', () => {
+            showToast("Chat Public ka feature jald aa raha hai!", "info");
+            
+            // TODO: Yahan par aap baad mein apna Chat Public ka logic dalenge.
+            // Example: window.openChatModal() ya koi window.location change karenge.
+        });
+
+        // ==========================================
+        // AUTHENTICATION & USER PROFILE LOGIC
+        // ==========================================
+        const provider = new GoogleAuthProvider();
+
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            if(!auth) return showToast("Firebase configure nahi hai!", "error");
+            try {
+                const result = await signInWithPopup(auth, provider);
+                closeLoginModal();
+                await checkAndCreateProfile(result.user);
+            } catch (error) {
+                showToast("Login Failed: " + error.message, "error");
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if(auth) signOut(auth);
+            document.getElementById('profileMenu').style.display = 'none';
+            showToast("Logged out successfully.", "info");
+        });
+
+        // Check user profile in Firestore
+        async function checkAndCreateProfile(firebaseUser) {
+            if(!db) return;
+            const userRef = doc(db, "users", firebaseUser.uid);
+            const docSnap = await getDoc(userRef);
+            
+            if (!docSnap.exists()) {
+                // Agar user DB mein nahi hai, toh Profile Setup form kholo
+                document.getElementById('profileSetupModal').classList.add('open');
+            } else {
+                // Agar user hai, toh data merge karlo
+                currentUser = { ...firebaseUser, ...docSnap.data() };
+                updateNavbarUI(currentUser);
+                showToast("Welcome back!", "success");
+            }
+        }
+
+        // Save new profile data
+        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+            const handle = document.getElementById('usernameInput').value.trim();
+            const bio = document.getElementById('bioInput').value.trim();
+            
+            if(!handle) return showToast("Username likhna zaroori hai!", "error");
+
+            try {
+                const newUserData = {
+                    name: auth.currentUser.displayName,
+                    email: auth.currentUser.email,
+                    photo: auth.currentUser.photoURL,
+                    handle: `@${handle.replace('@', '')}`, // Ensure single @
+                    bio: bio,
+                    createdAt: serverTimestamp()
+                };
+                
+                await setDoc(doc(db, "users", auth.currentUser.uid), newUserData);
+                
+                document.getElementById('profileSetupModal').classList.remove('open');
+                showToast("Profile successfully ban gayi!", "success");
+                
+                currentUser = { ...auth.currentUser, ...newUserData };
+                updateNavbarUI(currentUser);
+            } catch(e) {
+                showToast("Error saving profile: " + e.message, "error");
+            }
+        });
+
+        // Listen for Auth state on page load
+        if(auth) {
+            onAuthStateChanged(auth, async (user) => {
+                if(user) {
+                    // Check profile silently
+                    const userRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userRef);
+                    if(docSnap.exists()){
+                        currentUser = { ...user, ...docSnap.data() };
+                        updateNavbarUI(currentUser);
+                    } else {
+                        // User logged in via Google previously but didn't finish profile setup
+                        currentUser = user; 
+                        document.getElementById('profileSetupModal').classList.add('open');
+                        updateNavbarUI(user);
+                    }
+                } else {
+                    currentUser = null;
+                    updateNavbarUI(null);
+                }
+            });
+        }
+
+        function updateNavbarUI(user) {
+            const section = document.getElementById('userProfileSection');
+            const avatar = document.getElementById('currentUserAvatar');
+            
+            if(user) {
+                const photo = user.photo || user.photoURL || "https://ui-avatars.com/api/?name=U&background=random";
+                section.innerHTML = `<img src="${photo}" class="avatar cursor-pointer" onclick="window.toggleMenu()">`;
+                avatar.src = photo;
+            } else {
+                section.innerHTML = `<button onclick="window.openLoginModal()" class="text-sm font-semibold bg-orange-100 text-orange-600 px-4 py-2 rounded-xl">Log In</button>`;
+                avatar.src = "https://ui-avatars.com/api/?name=Guest&background=random";
+            }
+        }
+
+        // ==========================================
+        // LINK PREVIEW LOGIC
+        // ==========================================
+        window.handleLinkInput = function(value) {
+            const clearBtn = document.getElementById('clearLinkBtn');
+            const previewArea = document.getElementById('linkPreviewArea');
+            
+            clearTimeout(previewTimeout);
+
+            if (value.trim() === '') {
+                clearBtn.classList.add('hidden');
+                previewArea.style.display = 'none';
+                currentLinkPreview = null;
+                isPreviewLoading = false;
+                window.updatePostBtn();
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+            const urlPattern = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+            
+            if (urlPattern.test(value.trim())) {
+                isPreviewLoading = true;
+                window.updatePostBtn();
+
+                previewArea.style.display = 'block';
+                previewArea.innerHTML = `
+                    <div class="link-preview pointer-events-none">
+                        <div class="shimmer" style="height:150px;"></div>
+                        <div class="p-3"><div class="shimmer h-3 w-20 rounded mb-2"></div><div class="shimmer h-4 w-full rounded"></div></div>
+                    </div>
+                `;
+
+                previewTimeout = setTimeout(() => {
+                    const domain = value.trim().replace(/^https?:\/\//, '').split('/')[0];
+                    currentLinkPreview = {
+                        url: value.trim(),
+                        domain: domain,
+                        title: "Shared Web Link",
+                        desc: "Click to visit this resource.",
+                        image: `https://picsum.photos/seed/${domain}/600/300.jpg`
+                    };
+                    
+                    previewArea.innerHTML = `
+                        <div class="link-preview" onclick="window.open('${currentLinkPreview.url}', '_blank')">
+                            <img src="${currentLinkPreview.image}" class="link-preview-img">
+                            <div class="p-3">
+                                <div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${domain}</div>
+                                <div class="link-preview-title">${currentLinkPreview.title}</div>
+                            </div>
+                        </div>
+                    `;
+                    isPreviewLoading = false;
+                    window.updatePostBtn();
+                }, 800);
+            }
+        };
+
+        window.clearLink = function() {
+            document.getElementById('linkInput').value = '';
+            document.getElementById('linkPreviewArea').style.display = 'none';
+            document.getElementById('clearLinkBtn').classList.add('hidden');
+            currentLinkPreview = null;
+            isPreviewLoading = false;
+            clearTimeout(previewTimeout);
+            window.updatePostBtn();
+        };
+
+        // ==========================================
+        // IMAGE UPLOAD & RESIZE LOGIC
+        // ==========================================
+        window.handleImageUpload = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const MAX_WIDTH = 800;
+            const MAX_HEIGHT = 800;
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height = Math.round(height *= MAX_WIDTH / width);
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width = Math.round(width *= MAX_HEIGHT / height);
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const resizedImageUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    currentImagePreview = resizedImageUrl;
+                    
+                    document.getElementById('uploadedImage').src = resizedImageUrl;
+                    document.getElementById('imagePreviewArea').style.display = 'block';
+                    
+                    window.clearLink(); 
+                    window.updatePostBtn();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearImage = function() {
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imagePreviewArea').style.display = 'none';
+            currentImagePreview = null;
+            window.updatePostBtn();
+        };
+
+        // ==========================================
+        // POST CREATION LOGIC
+        // ==========================================
+        window.updatePostBtn = function() {
+            const text = document.getElementById('postText').textContent.trim();
+            const hasMedia = currentLinkPreview !== null || currentImagePreview !== null;
+            document.getElementById('postBtn').disabled = !((text.length > 0 || hasMedia) && !isPreviewLoading);
+        };
+
+        document.getElementById('postText').addEventListener('input', window.updatePostBtn);
+
+        window.createPost = async function() {
+            if(!currentUser) {
+                window.openLoginModal();
+                return;
+            }
+            
+            // Check if profile is complete before allowing post
+            if(!currentUser.handle) {
+                document.getElementById('profileSetupModal').classList.add('open');
+                showToast("Pehle apna username select karein!", "info");
+                return;
+            }
+
+            const text = document.getElementById('postText').textContent.trim();
+            document.getElementById('postBtn').disabled = true;
+
+            const postData = {
+                text: text,
+                author: currentUser.name || currentUser.displayName,
+                authorHandle: currentUser.handle, // Using user's unique handle
+                authorPic: currentUser.photo || currentUser.photoURL,
+                link: currentLinkPreview || null,
+                image: currentImagePreview || null,
+                createdAt: serverTimestamp()
+            };
+
+            if(db) {
+                try {
+                    await addDoc(collection(db, "posts"), postData);
+                    showToast("Post Live Ho Gayi!", "success");
+                    resetForm();
+                } catch(e) {
+                    showToast("Post fail: " + e.message, "error");
+                    window.updatePostBtn();
+                }
+            } else {
+                showToast("Firebase Config missing!", "info");
+                resetForm();
+            }
+        };
+
+        function resetForm() {
+            document.getElementById('postText').textContent = '';
+            window.clearLink();
+            window.clearImage();
+        }
+
+        // ==========================================
+        // FETCH & RENDER POSTS (Real-time Firestore)
+        // ==========================================
+        if(db) {
+            const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('feedContainer');
+                container.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    container.innerHTML = '<div class="text-center text-gray-400 py-10">Koi post nahi mili.</div>';
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    const post = doc.data();
+                    container.innerHTML += buildPostHTML(post);
+                });
+            });
+        }
+
+        function buildPostHTML(post) {
+            let mediaHTML = '';
+            if(post.link) {
+                mediaHTML = `
+                <div class="link-preview mt-3" onclick="window.open('${post.link.url}', '_blank')">
+                    <img src="${post.link.image}" class="link-preview-img">
+                    <div class="p-3">
+                        <div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${post.link.domain}</div>
+                        <div class="link-preview-title">${post.link.title}</div>
+                    </div>
+                </div>`;
+            } else if(post.image) {
+                mediaHTML = `<img src="${post.image}" class="mt-3 w-full max-h-80 object-cover rounded-xl border border-gray-200">`;
+            }
+
+            const handleDisplay = post.authorHandle ? `<div class="text-[0.78rem] text-gray-400">${post.authorHandle}</div>` : `<div class="text-[0.78rem] text-gray-400">Just Now</div>`;
+
+            return `
+            <article class="card p-5 mb-4 animation-fadeIn">
+                <div class="flex items-center gap-3 mb-3">
+                    <img src="${post.authorPic}" class="avatar">
+                    <div>
+                        <div class="font-bold text-[0.95rem] font-display">${post.author}</div>
+                        ${handleDisplay}
+                    </div>
+                </div>
+                <p class="text-[0.92rem] leading-relaxed text-gray-800">${post.text}</p>
+                ${mediaHTML}
+            </article>`;
+        }
+
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        window.openLoginModal = () => document.getElementById('loginModal').classList.add('open');
+        window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('open');
+        window.toggleMenu = () => {
+            const m = document.getElementById('profileMenu');
+            m.style.display = m.style.display === 'none' ? 'block' : 'none';
+        };
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast`;
+            const icon = type === 'success' ? 'fa-check-circle text-teal-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-orange-500';
+            toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

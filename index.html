@@ -138,15 +138,17 @@
                 
                 <div id="profileMenu" style="display:none;position:absolute;top:52px;right:0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:180px;z-index:50;">
                     
-                    <!-- Naya Edit Profile Button -->
-                    <a href="#" onclick="window.openProfileModal()" class="flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
-                        <i class="fas fa-user-edit text-orange-500 w-5"></i> Edit Profile
-                    </a>
+                    <!-- Naya Fixed Buttons -->
+                    <button onclick="window.openProfileModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
+                        <i class="fas fa-user-edit text-orange-500 w-5"></i> Create / Edit Profile
+                    </button>
                     
-                    <a href="#" class="flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
+                    <button onclick="window.openSettings()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700">
                         <i class="fas fa-cog text-blue-500 w-5"></i> Settings
-                    </a>
+                    </button>
+                    
                     <hr class="my-1 border-gray-100">
+                    
                     <button id="logoutBtn" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-red-50 text-red-500">
                         <i class="fas fa-sign-out-alt w-5"></i> Logout
                     </button>
@@ -248,9 +250,6 @@
         // ==========================================
         document.getElementById('chatPublicBtn').addEventListener('click', () => {
             showToast("Chat Public ka feature jald aa raha hai!", "info");
-            
-            // TODO: Yahan par aap baad mein apna Chat Public ka logic dalenge.
-            // Example: window.openChatModal() ya koi window.location change karenge.
         });
 
         // ==========================================
@@ -282,10 +281,8 @@
             const docSnap = await getDoc(userRef);
             
             if (!docSnap.exists()) {
-                // Agar user DB mein nahi hai, toh Profile Setup form kholo
                 document.getElementById('profileSetupModal').classList.add('open');
             } else {
-                // Agar user hai, toh data merge karlo
                 currentUser = { ...firebaseUser, ...docSnap.data() };
                 updateNavbarUI(currentUser);
                 showToast("Welcome back!", "success");
@@ -304,7 +301,7 @@
                     name: auth.currentUser.displayName,
                     email: auth.currentUser.email,
                     photo: auth.currentUser.photoURL,
-                    handle: `@${handle.replace('@', '')}`, // Ensure single @
+                    handle: `@${handle.replace('@', '')}`,
                     bio: bio,
                     createdAt: serverTimestamp()
                 };
@@ -325,18 +322,15 @@
         if(auth) {
             onAuthStateChanged(auth, async (user) => {
                 if(user) {
-                    // Check profile silently
                     const userRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(userRef);
                     if(docSnap.exists()){
                         currentUser = { ...user, ...docSnap.data() };
                         updateNavbarUI(currentUser);
                         
-                        // Populate modal inputs for future editing
                         document.getElementById('usernameInput').value = currentUser.handle.replace('@', '');
                         document.getElementById('bioInput').value = currentUser.bio || '';
                     } else {
-                        // User logged in via Google previously but didn't finish profile setup
                         currentUser = user; 
                         document.getElementById('profileSetupModal').classList.add('open');
                         updateNavbarUI(user);
@@ -504,7 +498,6 @@
                 return;
             }
             
-            // Check if profile is complete before allowing post
             if(!currentUser.handle) {
                 document.getElementById('profileSetupModal').classList.add('open');
                 showToast("Pehle apna username select karein!", "info");
@@ -517,7 +510,7 @@
             const postData = {
                 text: text,
                 author: currentUser.name || currentUser.displayName,
-                authorHandle: currentUser.handle, // Using user's unique handle
+                authorHandle: currentUser.handle,
                 authorPic: currentUser.photo || currentUser.photoURL,
                 link: currentLinkPreview || null,
                 image: currentImagePreview || null,
@@ -606,6 +599,11 @@
         window.openProfileModal = () => {
             document.getElementById('profileMenu').style.display = 'none';
             document.getElementById('profileSetupModal').classList.add('open');
+        };
+
+        window.openSettings = () => {
+            document.getElementById('profileMenu').style.display = 'none';
+            showToast("Settings feature jald aa raha hai!", "info");
         };
 
         window.toggleMenu = () => {

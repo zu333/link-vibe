@@ -162,6 +162,10 @@
         .admin-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: white; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .admin-toggle.on::after { transform: translateX(20px); }
 
+        /* Custom Footer Link Styles */
+        .footer-link { cursor: pointer; transition: color 0.2s; }
+        .footer-link:hover { color: var(--accent); }
+
         @media (max-width: 768px) {
             .search-box input { width: 120px; }
             .navbar-inner { padding: 0.5rem 1rem; }
@@ -284,6 +288,53 @@
         </div>
     </div>
 
+    <!-- About Us Modal -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="font-bold text-lg"><i class="fas fa-info-circle mr-2" style="color:var(--accent);"></i>About Us</h2>
+                <button onclick="document.getElementById('aboutModal').classList.remove('open')" class="btn-ghost" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body space-y-4 text-sm" style="color:var(--text2); line-height:1.7;">
+                <p><strong>FriendsFlow</strong> is a modern professional networking platform designed to connect individuals, share industry insights, and foster meaningful discussions.</p>
+                <p>Built with security and user experience in mind, our platform features real-time data synchronization, client-side AI content moderation to ensure a safe environment, and a clean, responsive interface.</p>
+                <p>Whether you are an independent developer, digital marketer, or tech enthusiast, FriendsFlow provides a seamless and secure space to build your professional network.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal-overlay" id="policyModal">
+        <div class="modal-content" style="max-width: 650px; max-height: 85vh;">
+            <div class="modal-header">
+                <h2 class="font-bold text-lg"><i class="fas fa-shield-alt mr-2" style="color:var(--accent);"></i>Privacy Policy & Terms</h2>
+                <button onclick="document.getElementById('policyModal').classList.remove('open')" class="btn-ghost" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body space-y-5 text-sm" style="color:var(--text2); line-height:1.7;">
+                <div>
+                    <h3 class="font-bold text-base mb-1" style="color:var(--text);">1. Information We Collect</h3>
+                    <p>When you use our platform, we collect authentication data via Google (Name, Email Address, and Profile Picture) to create your account. We also store your User-Generated Content (posts, links, comments) in our cloud database to display in the network feed. We do not use tracking cookies; we only use local storage for your UI preferences.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base mb-1" style="color:var(--text);">2. How We Use Your Information</h3>
+                    <p>Your name, profile picture, and headline are displayed publicly to other registered users. We use your data solely to provide and maintain the platform. <strong>We do not sell, rent, or share your personal data with third-party advertisers.</strong></p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base mb-1" style="color:var(--text);">3. AI Image Moderation</h3>
+                    <p>To maintain a safe environment, we utilize a client-side AI safety model. Images are scanned <em>directly inside your browser</em>. Inappropriate content is blocked locally and is never transmitted to our servers.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base mb-1" style="color:var(--text);">4. Acceptable Use</h3>
+                    <p>By posting, you agree to post no spam, fraudulent offers, or malicious links. Explicit or violent content is strictly prohibited. Users must interact professionally.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base mb-1" style="color:var(--text);">5. Admin Rights & Third-Party</h3>
+                    <p>Administrators reserve the right to remove any post or account violating these terms. Our platform relies on Google Firebase and GitHub Pages; by using our app, you acknowledge their respective privacy policies.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <div class="navbar-inner">
@@ -392,6 +443,17 @@
                 <div id="feedContainer" class="space-y-4 separate-posts-scroll">
                     <div class="text-center py-16" style="color:var(--muted);"><i class="fas fa-stream text-4xl mb-4" style="opacity:0.3;"></i><p class="text-sm font-medium">Loading your network feed...</p></div>
                 </div>
+
+                <!-- Mobile Footer (Visible only on small screens) -->
+                <div class="mt-8 mb-4 px-2 text-center lg:hidden border-t pt-4" style="border-color:var(--border);">
+                    <div class="flex justify-center flex-wrap gap-3 text-xs font-semibold" style="color:var(--muted);">
+                        <span onclick="document.getElementById('aboutModal').classList.add('open')" class="footer-link">About</span> &middot;
+                        <span onclick="document.getElementById('policyModal').classList.add('open')" class="footer-link">Privacy & Terms</span> &middot;
+                        <a href="mailto:naeemaamir0@gmail.com" class="footer-link" style="text-decoration:none; color:inherit;">Contact Us</a>
+                    </div>
+                    <p class="text-xs mt-3" style="color:var(--muted);">FriendsFlow &copy; 2026</p>
+                </div>
+
             </div>
 
             <!-- Right Sidebar -->
@@ -411,9 +473,15 @@
                     <div class="space-y-4" id="suggestedPeople"></div>
                     <button class="btn-ghost w-full mt-3 text-xs">Show more</button>
                 </div>
+                
+                <!-- Desktop Footer -->
                 <div class="mt-6 px-2">
-                    <p class="text-xs" style="color:var(--muted); line-height:1.8;">About &middot; Accessibility &middot; Help Center &middot; Privacy &middot; Terms</p>
-                    <p class="text-xs mt-2" style="color:var(--muted);">FriendsFlow Corporation &copy; 2025</p>
+                    <div class="flex flex-wrap gap-2 text-xs font-semibold" style="color:var(--muted);">
+                        <span onclick="document.getElementById('aboutModal').classList.add('open')" class="footer-link">About</span> &middot;
+                        <span onclick="document.getElementById('policyModal').classList.add('open')" class="footer-link">Privacy & Terms</span> &middot;
+                        <a href="mailto:naeemaamir0@gmail.com" class="footer-link" style="text-decoration:none; color:inherit;">Contact Us</a>
+                    </div>
+                    <p class="text-xs mt-3" style="color:var(--muted);">FriendsFlow Corporation &copy; 2026</p>
                 </div>
             </div>
         </div>
@@ -857,7 +925,7 @@
             updatePostBtn();
         };
 
-        /* ====== POST LOGIC & AI MODERATION (FIXED WITH IMAGE COMPRESSOR) ====== */
+        /* ====== POST LOGIC & AI MODERATION ====== */
         let currentImagePreview = null;
         let nsfwModel = null;
 
@@ -979,7 +1047,6 @@
                 postBtn.disabled = true;
                 postBtn.innerText = 'Publishing...';
 
-                // Naye features add kiye (likedBy, comments)
                 const post = {
                     text, 
                     uid: currentUser.uid, 
@@ -1134,7 +1201,6 @@
                 const linkHtml = post.link ? `<a href="${post.link.startsWith('http') ? post.link : 'https://'+post.link}" target="_blank" rel="noopener" class="link-preview"><i class="fas fa-external-link-alt"></i> ${post.link.length > 50 ? post.link.substring(0,50)+'...' : post.link}</a>` : '';
                 const time = timeAgo(post.createdAt);
                 
-                // Likes aur Comments Count Logic
                 let isLiked = currentUser && post.likedBy && post.likedBy.includes(currentUser.uid);
                 let likeCount = post.likedBy ? post.likedBy.length : 0;
                 let commentCount = post.comments ? post.comments.length : 0;

@@ -262,7 +262,7 @@
         </div>
     </div>
 
-    <!-- Admin Panel Modal (Full Screen Original) -->
+    <!-- Admin Panel Modal -->
     <div class="modal-overlay" id="adminPanelModal">
         <div class="modal-content" style="max-width:960px; max-height:90vh; border-radius:16px;">
             <div class="modal-header" style="background:var(--gradient-hero); border-bottom:none;">
@@ -270,7 +270,6 @@
                 <button onclick="window.closeAdminPanel()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem;"><i class="fas fa-times"></i></button>
             </div>
             <div style="display:flex; min-height:500px;">
-                <!-- Admin Sidebar -->
                 <div style="width:220px; border-right:1px solid var(--border); padding:16px 12px; flex-shrink:0;" id="adminSidebar">
                     <button class="admin-sidebar-link active" onclick="window.showAdminTab('overview')"><i class="fas fa-chart-pie"></i> Overview</button>
                     <button class="admin-sidebar-link" onclick="window.showAdminTab('users')"><i class="fas fa-users"></i> Users</button>
@@ -280,9 +279,7 @@
                     <div style="height:1px; background:var(--border); margin:12px 0;"></div>
                     <button class="admin-sidebar-link" onclick="window.showAdminTab('danger')" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</button>
                 </div>
-                <!-- Admin Content -->
                 <div style="flex:1; padding:24px; overflow-y:auto; max-height:calc(90vh - 60px);" id="adminContent">
-                    <!-- Loaded dynamically via JS -->
                 </div>
             </div>
         </div>
@@ -463,7 +460,7 @@
             { name: 'Arjun Patel', role: 'Full-Stack Developer', color: '2ECC71' }
         ];
 
-        /* ====== ADMIN SYSTEM (WITH lahore799 PASSWORD) ====== */
+        /* ====== ADMIN SYSTEM ====== */
         let logoClickCount = 0;
         let logoClickTimer = null;
 
@@ -490,7 +487,7 @@
             if (pwd === 'lahore799') {
                 adminUnlocked = true;
                 document.getElementById('adminPasswordModal').classList.remove('open');
-                showToast('Admin access granted', 'success');
+                window.showToast('Admin access granted', 'success');
                 window.openAdminPanel();
             } else {
                 document.getElementById('adminPasswordError').classList.remove('hidden');
@@ -508,7 +505,7 @@
             document.getElementById('adminPanelModal').classList.remove('open');
         };
 
-        /* ORIGINAL ADMIN TABS */
+        /* ADMIN TABS */
         window.showAdminTab = function(tab) {
             document.querySelectorAll('.admin-sidebar-link').forEach(el => el.classList.remove('active'));
             if(event && event.target) event.target.closest('.admin-sidebar-link')?.classList.add('active');
@@ -662,7 +659,7 @@
             const s = JSON.parse(localStorage.getItem('ff_settings') || '{}');
             s[key] = value;
             localStorage.setItem('ff_settings', JSON.stringify(s));
-            showToast('Setting saved', 'success');
+            window.showToast('Setting saved', 'success');
         };
 
         window.saveAppearance = function(key, value) {
@@ -676,7 +673,7 @@
             if (key === 'showRightSidebar') {
                 document.getElementById('homeRightSidebar').style.display = value ? '' : 'none';
             }
-            showToast('Appearance updated', 'success');
+            window.showToast('Appearance updated', 'success');
         };
 
         window.changeAccentColor = function(color) {
@@ -684,7 +681,7 @@
             const a = JSON.parse(localStorage.getItem('ff_appearance') || '{}');
             a.accent = color;
             localStorage.setItem('ff_appearance', JSON.stringify(a));
-            showToast('Accent color changed', 'success');
+            window.showToast('Accent color changed', 'success');
             window.showAdminTab('appearance');
         };
 
@@ -692,9 +689,9 @@
             if (!db || !postId) return;
             try {
                 await deleteDoc(doc(db, "posts", postId));
-                showToast('Post deleted', 'success');
+                window.showToast('Post deleted', 'success');
             } catch(e) {
-                showToast('Error deleting post', 'error');
+                window.showToast('Error deleting post', 'error');
             }
         };
 
@@ -705,9 +702,9 @@
                 const delPromises = [];
                 snapshot.forEach(d => delPromises.push(deleteDoc(d.ref)));
                 await Promise.all(delPromises);
-                showToast('All posts deleted', 'success');
+                window.showToast('All posts deleted', 'success');
             } catch(e) {
-                showToast('Error deleting posts', 'error');
+                window.showToast('Error deleting posts', 'error');
             }
         };
 
@@ -747,7 +744,7 @@
                 window.closeLoginModal();
                 checkAndCreateProfile(result.user);
             } catch (e) {
-                if (e.code !== 'auth/popup-closed-by-user') showToast('Login failed', 'error');
+                if (e.code !== 'auth/popup-closed-by-user') window.showToast('Login failed', 'error');
             }
         });
 
@@ -756,7 +753,7 @@
             currentUser = null;
             document.getElementById('profileMenu').classList.remove('show');
             updateNavbarUI();
-            showToast('Signed out', 'success');
+            window.showToast('Signed out', 'success');
         });
 
         async function checkAndCreateProfile(user) {
@@ -768,7 +765,7 @@
                 if (snap.exists()) {
                     currentUser = { ...user, ...snap.data() };
                     updateNavbarUI();
-                    showToast(`Welcome back, ${currentUser.name||'User'}!`, 'success');
+                    window.showToast(`Welcome back, ${currentUser.name||'User'}!`, 'success');
                 } else {
                     currentUser = user;
                     window.openProfileModal();
@@ -786,7 +783,7 @@
         document.getElementById('saveProfileBtn').addEventListener('click', async () => {
             const name = document.getElementById('displayNameInput').value.trim();
             const title = document.getElementById('usernameInput').value.trim();
-            if (!name) return showToast('Name is required', 'error');
+            if (!name) return window.showToast('Name is required', 'error');
             const data = { name, handle: title, photo: document.getElementById('profileAvatarPreview').src, createdAt: serverTimestamp() };
             if (db && currentUser) {
                 try {
@@ -794,8 +791,8 @@
                     currentUser = { ...currentUser, ...data };
                     updateNavbarUI();
                     document.getElementById('profileSetupModal').classList.remove('open');
-                    showToast('Profile saved!', 'success');
-                } catch(e) { showToast('Error saving profile', 'error'); }
+                    window.showToast('Profile saved!', 'success');
+                } catch(e) { window.showToast('Error saving profile', 'error'); }
             }
         });
 
@@ -837,6 +834,7 @@
         window.removeLinkInput = function() {
             document.getElementById('linkInputArea').style.display = 'none';
             document.getElementById('postLinkInput').value = '';
+            updatePostBtn();
         };
 
         document.getElementById('postLinkInput')?.addEventListener('keydown', function(e) {
@@ -864,7 +862,6 @@
         let currentImagePreview = null;
         let nsfwModel = null;
 
-        // Initialize NSFWJS Model silently in background
         if (typeof nsfwjs !== 'undefined') {
             nsfwjs.load().then(model => { 
                 nsfwModel = model; 
@@ -884,7 +881,6 @@
                 imgElement.src = ev.target.result;
                 
                 imgElement.onload = async () => {
-                    // Check image with AI model before showing preview
                     if (nsfwModel) {
                         try {
                             const predictions = await nsfwModel.classify(imgElement);
@@ -895,14 +891,13 @@
                             if (isUnsafe) {
                                 window.showToast('🚫 Inappropriate image detected! Upload blocked.', 'error');
                                 window.clearImage();
-                                return; // Block upload completely
+                                return;
                             }
                         } catch (err) {
                             console.error("Image classification error", err);
                         }
                     }
                     
-                    // If safe, allow preview
                     currentImagePreview = ev.target.result; 
                     document.getElementById('uploadedImage').src = currentImagePreview; 
                     document.getElementById('imagePreviewArea').style.display = 'block'; 
@@ -922,11 +917,14 @@
 
         function updatePostBtn() {
             const text = document.getElementById('postText').value.trim();
-            document.getElementById('postBtn').disabled = !(text.length > 0 || currentImagePreview || currentPostLink);
+            const linkText = document.getElementById('postLinkInput') ? document.getElementById('postLinkInput').value.trim() : '';
+            const hasLinkInput = document.getElementById('linkInputArea').style.display !== 'none' && linkText !== '';
+            
+            document.getElementById('postBtn').disabled = !(text.length > 0 || currentImagePreview || currentPostLink || hasLinkInput);
         }
         document.getElementById('postText').addEventListener('input', updatePostBtn);
+        document.getElementById('postLinkInput')?.addEventListener('input', updatePostBtn);
 
-        // Spam Filter Keywords
         const spamBlacklist = [
             "free-money", "casino", "betting", "xxx", "porn", "viagra", 
             "earn-fast", "click-here", "lottery", "crypto-giveaway", "scam-link.com"
@@ -938,41 +936,70 @@
             return spamBlacklist.some(keyword => lowerText.includes(keyword));
         }
 
+        // ====== FIXED CREATE POST FUNCTION ======
         window.createPost = async function() {
-            if (!currentUser) return window.openLoginModal();
-            const text = document.getElementById('postText').value.trim();
-            
-            // Spam validation
-            if (isSpam(text) || isSpam(currentPostLink)) {
-                window.showToast('🚫 Your post contains blocked or spammy content.', 'error');
-                return;
-            }
+            try {
+                if (!currentUser) return window.openLoginModal();
+                const text = document.getElementById('postText').value.trim();
+                
+                // Naya tareeqa link nikalne ka bina enter press kiye
+                let finalLink = currentPostLink;
+                const linkInputField = document.getElementById('postLinkInput');
+                if (document.getElementById('linkInputArea').style.display !== 'none' && linkInputField && linkInputField.value.trim() !== '') {
+                    finalLink = linkInputField.value.trim();
+                }
 
-            document.getElementById('postBtn').disabled = true;
+                if (isSpam(text) || isSpam(finalLink)) {
+                    window.showToast('🚫 Your post contains blocked or spammy content.', 'error');
+                    return;
+                }
 
-            const post = {
-                text, 
-                uid: currentUser.uid, 
-                author: currentUser.name || 'User',
-                authorPic: currentUser.photo || 'https://ui-avatars.com/api/?name=U&background=1B6B5A&color=fff&size=64',
-                authorHandle: currentUser.handle || 'Member',
-                image: currentImagePreview,
-                link: currentPostLink,
-                likes: 0,
-                createdAt: serverTimestamp()
-            };
+                // Button state loading pe
+                const postBtn = document.getElementById('postBtn');
+                postBtn.disabled = true;
+                postBtn.innerText = 'Publishing...';
 
-            if (db) {
-                try {
+                const post = {
+                    text, 
+                    uid: currentUser.uid, 
+                    author: currentUser.name || 'User',
+                    authorPic: currentUser.photo || 'https://ui-avatars.com/api/?name=U&background=1B6B5A&color=fff&size=64',
+                    authorHandle: currentUser.handle || 'Member',
+                    image: currentImagePreview,
+                    link: finalLink,
+                    likes: 0,
+                    createdAt: serverTimestamp()
+                };
+
+                if (db) {
                     await addDoc(collection(db, 'posts'), post);
+                    
+                    // Sab fields normal karna
                     document.getElementById('postText').value = '';
                     window.clearImage();
-                    window.removeLink();
-                    window.showToast('Post published!', 'success');
-                } catch(e) { 
-                    window.showToast('Error posting', 'error'); 
-                    document.getElementById('postBtn').disabled = false; 
+                    window.removeLink(); 
+                    if(linkInputField) linkInputField.value = ''; 
+                    document.getElementById('linkInputArea').style.display = 'none';
+                    currentPostLink = null;
+                    
+                    window.showToast('Post published successfully!', 'success');
+                } else {
+                    throw new Error("Database connection is missing.");
                 }
+
+            } catch(error) { 
+                console.error("Publishing Error Details: ", error);
+                if (error.message && error.message.includes("Missing or insufficient permissions")) {
+                    window.showToast('Error: Firebase Rules abhi theek nahi hain!', 'error');
+                } else {
+                    window.showToast('Error: ' + error.message, 'error'); 
+                }
+            } finally {
+                // Publish finish hone ke baad button wapas restore ho jayega
+                const postBtn = document.getElementById('postBtn');
+                postBtn.disabled = false;
+                postBtn.innerText = 'Publish';
+                updatePostBtn(); 
             }
         };
 
@@ -982,7 +1009,12 @@
             onSnapshot(q, (snap) => {
                 allPostsArray = [];
                 snap.forEach(d => allPostsArray.push({ id: d.id, ...d.data() }));
-                renderFeed();
+                window.renderFeed();
+            }, (error) => {
+                 console.error("Feed Fetch Error: ", error);
+                 if(error.message && error.message.includes("permission")) {
+                     window.showToast('Warning: Unable to load posts due to Database Rules', 'error');
+                 }
             });
         }
 
@@ -1007,7 +1039,7 @@
             let html = '';
             allPostsArray.forEach((post, i) => {
                 const imgHtml = post.image ? `<div><img src="${post.image}" style="width:100%; max-height:420px; object-fit:cover;"></div>` : '';
-                const linkHtml = post.link ? `<a href="${post.link}" target="_blank" rel="noopener" class="link-preview"><i class="fas fa-external-link-alt"></i> ${post.link.length > 50 ? post.link.substring(0,50)+'...' : post.link}</a>` : '';
+                const linkHtml = post.link ? `<a href="${post.link.startsWith('http') ? post.link : 'https://'+post.link}" target="_blank" rel="noopener" class="link-preview"><i class="fas fa-external-link-alt"></i> ${post.link.length > 50 ? post.link.substring(0,50)+'...' : post.link}</a>` : '';
                 const time = timeAgo(post.createdAt);
                 html += `
                 <article class="card post-card fade-in" style="animation-delay:${i<5?i*0.05:0}s;">

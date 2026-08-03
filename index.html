@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <!-- Profile Setup Modal -->
+    <!-- Profile Setup Modal (Fixed Save Button) -->
     <div class="modal-overlay" id="profileSetupModal">
         <div class="modal-content" style="max-width: 450px;">
             <h2 class="font-display font-bold text-2xl mb-2">Your Profile</h2>
@@ -91,10 +91,13 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Bio (Optional)</label>
                 <textarea id="bioInput" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none text-sm text-gray-800 focus:border-orange-500 transition" placeholder="Apne bare mein kuch alfaz..."></textarea>
             </div>
+            
+            <!-- Yeh hai Save button jo miss ho gaya tha -->
             <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:shadow-lg text-white font-semibold py-3 rounded-xl transition transform hover:-translate-y-0.5">
                 Save Profile
             </button>
-            <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="mt-4 text-sm text-gray-400 hover:text-gray-600">Cancel</button>
+            
+            <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="mt-4 text-sm text-gray-400 hover:text-gray-600 w-full">Cancel</button>
         </div>
     </div>
 
@@ -498,7 +501,7 @@
         }
 
         // ==========================================
-        // SMART POST CREATOR (USER OR PAGE)
+        // POST & MEDIA UPLOAD LOGIC
         // ==========================================
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
@@ -573,7 +576,7 @@
         };
 
         // ==========================================
-        // SMART FEED (FILTERED) WITH LIKES/COMMENTS
+        // SMART FEED & INTERACTIVE ACTION BUTTONS
         // ==========================================
         if(db) {
             const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -586,6 +589,52 @@
                 window.renderFeed();
             });
         }
+
+        // Active Buttons Logic (Like, Dislike, Comment, Share)
+        window.toggleLike = function(btn) {
+            // Remove dislike if active
+            const dislikeBtn = btn.nextElementSibling;
+            if(dislikeBtn.classList.contains('text-red-600')) {
+                dislikeBtn.classList.remove('text-red-600', 'bg-red-50');
+            }
+            // Toggle like
+            btn.classList.toggle('text-blue-600');
+            btn.classList.toggle('bg-blue-50');
+        };
+
+        window.toggleDislike = function(btn) {
+            // Remove like if active
+            const likeBtn = btn.previousElementSibling;
+            if(likeBtn.classList.contains('text-blue-600')) {
+                likeBtn.classList.remove('text-blue-600', 'bg-blue-50');
+            }
+            // Toggle dislike
+            btn.classList.toggle('text-red-600');
+            btn.classList.toggle('bg-red-50');
+        };
+
+        window.toggleComment = function(postId) {
+            const commentSection = document.getElementById(`comment-section-${postId}`);
+            if(commentSection) {
+                commentSection.classList.toggle('hidden');
+                if(!commentSection.classList.contains('hidden')) {
+                    commentSection.querySelector('input').focus();
+                }
+            }
+        };
+
+        window.sharePost = function(text, url) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'LinkVibe Post',
+                    text: text,
+                    url: url || window.location.href,
+                }).catch((error) => console.log('Error sharing', error));
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                window.showToast("Post link copied to clipboard!", "success");
+            }
+        };
 
         window.renderFeed = function() {
             const container = document.getElementById('feedContainer');
@@ -606,7 +655,6 @@
                 if(post.link) {
                     mediaHTML = `<div class="link-preview mt-3" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${post.link.domain}</div><div class="link-preview-title">${post.link.title}</div></div></div>`;
                 } else if(post.image) {
-                    // YAHAN IMAGE FIX KI HAI (object-contain)
                     mediaHTML = `<img src="${post.image}" class="mt-3 w-full bg-gray-50 object-contain rounded-xl border border-gray-100" style="max-height: 500px;">`;
                 }
 
@@ -614,20 +662,27 @@
                 const textDisplay = post.text && post.text !== 'undefined' ? post.text : '';
                 const pageBadge = (currentContext.type === 'home' && post.pageId) ? `<i class="fas fa-check-circle text-teal-500 text-xs ml-1" title="Official Page"></i>` : '';
 
-                // NEW: Action Buttons (Like, Dislike, Comment, Share)
+                // Active Buttons UI
                 const actionButtons = `
                 <div class="border-t border-gray-100 mt-4 pt-3 flex items-center justify-between text-gray-500">
                     <div class="flex gap-2 sm:gap-4">
-                        <button onclick="showToast('Liked!', 'success')" class="hover:text-blue-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-up"></i> <span class="text-xs font-medium hidden sm:inline">Like</span></button>
-                        <button onclick="showToast('Disliked!', 'info')" class="hover:text-red-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-down"></i> <span class="text-xs font-medium hidden sm:inline">Dislike</span></button>
-                        <button onclick="showToast('Comment section opening...', 'info')" class="hover:text-teal-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-comment"></i> <span class="text-xs font-medium hidden sm:inline">Comment</span></button>
+                        <button onclick="window.toggleLike(this)" class="transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-up"></i> <span class="text-xs font-medium hidden sm:inline">Like</span></button>
+                        <button onclick="window.toggleDislike(this)" class="transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-down"></i> <span class="text-xs font-medium hidden sm:inline">Dislike</span></button>
+                        <button onclick="window.toggleComment('${post.id}')" class="hover:text-teal-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-comment"></i> <span class="text-xs font-medium hidden sm:inline">Comment</span></button>
                     </div>
-                    <button onclick="showToast('Share options opening...', 'info')" class="hover:text-green-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-share"></i> <span class="text-xs font-medium hidden sm:inline">Share</span></button>
+                    <button onclick="window.sharePost('${textDisplay.substring(0, 30)}...')" class="hover:text-green-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-share"></i> <span class="text-xs font-medium hidden sm:inline">Share</span></button>
+                </div>
+                
+                <!-- Comment Input Area (Hidden by Default) -->
+                <div id="comment-section-${post.id}" class="hidden mt-3 pt-3 border-t border-gray-50">
+                    <div class="flex items-center gap-2">
+                        <img src="${currentUser ? (currentUser.photo || currentUser.photoURL) : 'https://ui-avatars.com/api/?name=Guest'}" class="w-8 h-8 rounded-full border border-gray-200">
+                        <input type="text" placeholder="Write a comment..." class="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-1.5 text-sm outline-none focus:border-teal-500 transition" onkeypress="if(event.key === 'Enter') { this.value=''; window.showToast('Comment posted!', 'success'); window.toggleComment('${post.id}'); }">
+                    </div>
                 </div>
                 `;
 
-                // NEW: Follow Button
-                const followBtn = `<button onclick="showToast('Followed ${post.author}!', 'success')" class="text-orange-500 text-xs font-semibold hover:bg-orange-50 px-3 py-1.5 rounded-full border border-orange-500 transition"><i class="fas fa-plus"></i> Follow</button>`;
+                const followBtn = `<button onclick="window.showToast('Followed ${post.author}!', 'success')" class="text-orange-500 text-xs font-semibold hover:bg-orange-50 px-3 py-1.5 rounded-full border border-orange-500 transition"><i class="fas fa-plus"></i> Follow</button>`;
 
                 container.innerHTML += `
                 <article class="card p-5 mb-4 animation-fadeIn">

@@ -858,7 +858,7 @@
             updatePostBtn();
         };
 
-        /* ====== POST LOGIC & AI MODERATION (NSFWJS) ====== */
+        /* ====== POST LOGIC & AI MODERATION (FIXED WITH IMAGE COMPRESSOR) ====== */
         let currentImagePreview = null;
         let nsfwModel = null;
 
@@ -872,37 +872,64 @@
         window.handleImageUpload = async function(e) {
             const f = e.target.files[0]; if (!f) return;
             
-            window.showToast('Scanning image for safety...', 'info');
+            window.showToast('Optimizing & Scanning image...', 'info');
             document.getElementById('postBtn').disabled = true;
 
             const r = new FileReader();
-            r.onload = async (ev) => { 
+            r.onload = (ev) => { 
                 const imgElement = new Image();
                 imgElement.src = ev.target.result;
                 
                 imgElement.onload = async () => {
-                    if (nsfwModel) {
-                        try {
-                            const predictions = await nsfwModel.classify(imgElement);
-                            const isUnsafe = predictions.some(p => 
-                                (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.6
-                            );
-                            
-                            if (isUnsafe) {
-                                window.showToast('🚫 Inappropriate image detected! Upload blocked.', 'error');
-                                window.clearImage();
-                                return;
-                            }
-                        } catch (err) {
-                            console.error("Image classification error", err);
-                        }
+                    // --- IMAGE COMPRESSOR START ---
+                    const canvas = document.createElement('canvas');
+                    let width = imgElement.width;
+                    let height = imgElement.height;
+                    const maxSize = 800; // Limit image pixels to prevent browser hang and Firebase limit
+
+                    if (width > height && width > maxSize) {
+                        height = Math.round(height * maxSize / width);
+                        width = maxSize;
+                    } else if (height > maxSize) {
+                        width = Math.round(width * maxSize / height);
+                        height = maxSize;
                     }
-                    
-                    currentImagePreview = ev.target.result; 
-                    document.getElementById('uploadedImage').src = currentImagePreview; 
-                    document.getElementById('imagePreviewArea').style.display = 'block'; 
-                    updatePostBtn();
-                    window.showToast('Image is safe ✓', 'success');
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(imgElement, 0, 0, width, height);
+
+                    // Compress to JPEG format with 70% quality
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    // --- IMAGE COMPRESSOR END ---
+
+                    const scanImg = new Image();
+                    scanImg.src = compressedBase64;
+                    scanImg.onload = async () => {
+                        if (nsfwModel) {
+                            try {
+                                const predictions = await nsfwModel.classify(scanImg);
+                                const isUnsafe = predictions.some(p => 
+                                    (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.6
+                                );
+                                
+                                if (isUnsafe) {
+                                    window.showToast('🚫 Inappropriate image detected! Upload blocked.', 'error');
+                                    window.clearImage();
+                                    return;
+                                }
+                            } catch (err) {
+                                console.error("Image classification error", err);
+                            }
+                        }
+                        
+                        currentImagePreview = compressedBase64; 
+                        document.getElementById('uploadedImage').src = currentImagePreview; 
+                        document.getElementById('imagePreviewArea').style.display = 'block'; 
+                        updatePostBtn();
+                        window.showToast('Image attached ✓', 'success');
+                    };
                 };
             };
             r.readAsDataURL(f);
@@ -942,7 +969,6 @@
                 if (!currentUser) return window.openLoginModal();
                 const text = document.getElementById('postText').value.trim();
                 
-                // Naya tareeqa link nikalne ka bina enter press kiye
                 let finalLink = currentPostLink;
                 const linkInputField = document.getElementById('postLinkInput');
                 if (document.getElementById('linkInputArea').style.display !== 'none' && linkInputField && linkInputField.value.trim() !== '') {
@@ -954,7 +980,6 @@
                     return;
                 }
 
-                // Button state loading pe
                 const postBtn = document.getElementById('postBtn');
                 postBtn.disabled = true;
                 postBtn.innerText = 'Publishing...';
@@ -974,7 +999,6 @@
                 if (db) {
                     await addDoc(collection(db, 'posts'), post);
                     
-                    // Sab fields normal karna
                     document.getElementById('postText').value = '';
                     window.clearImage();
                     window.removeLink(); 
@@ -995,7 +1019,6 @@
                     window.showToast('Error: ' + error.message, 'error'); 
                 }
             } finally {
-                // Publish finish hone ke baad button wapas restore ho jayega
                 const postBtn = document.getElementById('postBtn');
                 postBtn.disabled = false;
                 postBtn.innerText = 'Publish';

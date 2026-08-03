@@ -9,113 +9,127 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
+            /* Light Mode Variables */
             --bg: #FFF8F3; --bg2: #FFF1E8; --card: #FFFFFF;
-            --accent: #E8613C; --accent2: #F4A261; --accent3: #2EC4B6;
+            --accent: #E8613C; --accent2: #F4A261;
             --text: #2D2A32; --text2: #6B6574; --muted: #B0A9B9;
             --border: #F0E6DE;
             --shadow: 0 4px 24px rgba(232, 97, 60, 0.08);
-            --shadow-hover: 0 8px 32px rgba(232, 97, 60, 0.14);
+            --chat-bg: #efeae2;
+        }
+
+        /* Dark Mode Variables */
+        body.dark-mode {
+            --bg: #121212; --bg2: #1e1e1e; --card: #1e1e1e;
+            --text: #e0e0e0; --text2: #a0a0a0; --muted: #666;
+            --border: #333333;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --chat-bg: #1a1a1a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Outfit', sans-serif; }
 
         /* Navbar & Utilities */
-        .navbar { position: sticky; top: 0; z-index: 100; background: rgba(255, 248, 243, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; transition: box-shadow 0.3s; }
-        .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.6rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-        .card { background: var(--card); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .link-bar { background: var(--card); border-radius: 20px; border: 2px dashed var(--border); overflow: hidden; }
-        .link-bar input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
-        .btn-post { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 14px; padding: 0.6rem 1.5rem; font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .navbar { position: sticky; top: 0; z-index: 100; background: var(--card); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; transition: all 0.3s; }
+        .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Smaller Avatars */
+        .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+        .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s; }
+        .link-bar { background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border); overflow: hidden; }
+        .link-bar input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.9rem; color: var(--text); }
+        .btn-post { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 12px; padding: 0.5rem 1.2rem; font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Modals & Effects */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(45, 42, 50, 0.6); backdrop-filter: blur(8px); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--card); border-radius: 24px; padding: 2rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15); transform: scale(0.9); transition: transform 0.3s; text-align: center; max-height: 90vh; overflow-y: auto;}
+        .modal-content { background: var(--card); border-radius: 20px; padding: 1.5rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s; text-align: center; max-height: 90vh; overflow-y: auto; color: var(--text); }
         .modal-overlay.open .modal-content { transform: scale(1); }
-        .shimmer { background: linear-gradient(90deg, var(--bg2) 25%, var(--card) 50%, var(--bg2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
         /* Chat Specific Scrollbar */
-        .chat-scroll::-webkit-scrollbar { width: 6px; }
-        .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .modal-content::-webkit-scrollbar { width: 4px; }
-        .modal-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        #pagesContainer::-webkit-scrollbar { display: none; }
+        .chat-scroll::-webkit-scrollbar { width: 5px; }
+        .chat-scroll::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; }
 
         /* Full Screen Chat Animation */
-        #fullScreenChat { transition: transform 0.4s ease-in-out; transform: translateY(100%); }
+        #fullScreenChat { transition: transform 0.4s ease-in-out; transform: translateY(100%); background: var(--bg); }
         #fullScreenChat.open { transform: translateY(0); }
         
-        .chat-bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; position: relative; font-size: 0.92rem; line-height: 1.4; }
+        /* Chat Bubble Fixes */
+        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 16px; position: relative; font-size: 0.88rem; line-height: 1.4; word-wrap: break-word; }
         .chat-bubble.me { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border-bottom-right-radius: 4px; }
-        .chat-bubble.other { background: #f3f4f6; color: #1f2937; border-bottom-left-radius: 4px; }
+        .chat-bubble.other { background: var(--bg2); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
+        
+        /* Text inputs in dark mode */
+        input, textarea, select { color: var(--text); background: var(--bg2); border-color: var(--border); }
+        
+        /* Emoji Picker */
+        .emoji-picker { display: none; position: absolute; bottom: 60px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; box-shadow: var(--shadow); width: 220px; z-index: 50; }
+        .emoji-picker.active { display: flex; flex-wrap: wrap; gap: 8px; }
+        .emoji-item { cursor: pointer; font-size: 1.2rem; transition: transform 0.1s; }
+        .emoji-item:hover { transform: scale(1.2); }
     </style>
 </head>
-<body>
+<body class="transition-colors duration-300">
 
     <!-- Toast Container -->
     <div class="toast-container fixed top-20 right-5 z-[9999] flex flex-col gap-2" id="toastContainer"></div>
 
-    <!-- Modals (Login, Profile, Create Page, Settings) -->
+    <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
             <h2 class="font-display font-bold text-2xl mb-2">Welcome to LinkVibe</h2>
-            <p class="text-sm text-gray-500 mb-6">Aage barhne ke liye login karein.</p>
-            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl bg-white border-2 border-gray-200 hover:bg-gray-50 transition font-medium">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:24px;">
+            <p class="text-sm text-[var(--text2)] mb-6">Aage barhne ke liye login karein.</p>
+            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition font-medium" style="background:var(--bg2); border-color:var(--border);">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;">
                 Continue with Google
             </button>
-            <button onclick="window.closeLoginModal()" class="mt-4 text-sm text-gray-400 hover:text-gray-600">Cancel</button>
+            <button onclick="window.closeLoginModal()" class="mt-4 text-sm text-[var(--muted)] hover:text-[var(--text)]">Cancel</button>
         </div>
     </div>
 
+    <!-- Profile Setup Modal -->
     <div class="modal-overlay" id="profileSetupModal">
         <div class="modal-content" style="max-width: 450px;">
             <h2 class="font-display font-bold text-2xl mb-2">Your Profile</h2>
-            <p class="text-sm text-gray-500 mb-6">LinkVibe par apni pehchan banayein ya update karein!</p>
             <div class="text-left mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Username (Handle)</label>
-                <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 focus-within:border-orange-500 transition">
-                    <span class="text-gray-400 mr-1">@</span>
-                    <input type="text" id="usernameInput" class="bg-transparent outline-none w-full text-sm text-gray-800" placeholder="ali_dev">
+                <label class="block text-sm font-medium mb-1">Username (Handle)</label>
+                <div class="flex items-center rounded-xl px-3 py-2 border" style="background:var(--bg2); border-color:var(--border);">
+                    <span class="text-[var(--muted)] mr-1">@</span>
+                    <input type="text" id="usernameInput" class="bg-transparent outline-none w-full text-sm" placeholder="ali_dev">
                 </div>
             </div>
             <div class="text-left mb-6">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Bio (Optional)</label>
-                <textarea id="bioInput" rows="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 outline-none text-sm text-gray-800 focus:border-orange-500 transition" placeholder="Apne bare mein kuch alfaz..."></textarea>
+                <label class="block text-sm font-medium mb-1">Bio (Optional)</label>
+                <textarea id="bioInput" rows="2" class="w-full rounded-xl p-3 outline-none text-sm border" style="background:var(--bg2); border-color:var(--border);"></textarea>
             </div>
-            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:shadow-lg text-white font-semibold py-3 rounded-xl transition transform hover:-translate-y-0.5">Save Profile</button>
-            <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="mt-4 text-sm text-gray-400 hover:text-gray-600 w-full">Cancel</button>
+            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold py-3 rounded-xl transition">Save Profile</button>
+            <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="mt-3 text-sm text-[var(--muted)] w-full">Cancel</button>
         </div>
     </div>
 
-    <!-- Create Page & Settings Modals (Hidden for brevity, they remain same as previous code) -->
-    <!-- Note: Keeping them minimal here to save space, but they function exactly the same -->
+    <!-- Create Page Modal -->
     <div class="modal-overlay" id="createPageModal">
-        <div class="modal-content" style="max-width: 500px; text-align: left; padding: 0;">
-            <div class="relative h-32 bg-gray-200 cursor-pointer hover:bg-gray-300 transition flex items-center justify-center group" onclick="document.getElementById('pageCoverInput').click()">
+        <div class="modal-content" style="max-width: 450px; padding:0;">
+            <div class="relative h-28 cursor-pointer group" onclick="document.getElementById('pageCoverInput').click()" style="background:var(--bg2);">
                 <img id="pageCoverPreview" src="" class="absolute inset-0 w-full h-full object-cover hidden">
-                <span class="absolute bottom-2 right-2 text-xs text-white bg-black bg-opacity-50 px-2 py-1 rounded">Add Cover</span>
+                <span class="absolute bottom-2 right-2 text-xs text-white bg-black/50 px-2 py-1 rounded">Add Cover</span>
                 <input type="file" id="pageCoverInput" accept="image/*" class="hidden" onchange="window.handlePageCover(event)">
             </div>
-            <div class="px-6 pb-6 relative">
-                <div class="relative -mt-12 mb-4 w-24 h-24 bg-white rounded-full border-4 border-white cursor-pointer hover:shadow-lg transition shadow-sm mx-auto" onclick="document.getElementById('pageLogoInput').click()">
-                    <img id="pageLogoPreview" src="https://ui-avatars.com/api/?name=P&background=f4f4f5&color=a1a1aa" class="w-full h-full rounded-full object-cover">
+            <div class="px-5 pb-5 relative">
+                <div class="relative -mt-10 mb-4 w-20 h-20 rounded-full border-4 cursor-pointer mx-auto" onclick="document.getElementById('pageLogoInput').click()" style="border-color:var(--card); background:var(--bg2);">
+                    <img id="pageLogoPreview" src="https://ui-avatars.com/api/?name=P" class="w-full h-full rounded-full object-cover">
                     <input type="file" id="pageLogoInput" accept="image/*" class="hidden" onchange="window.handlePageLogo(event)">
                 </div>
-                <div class="text-center mb-6"><h2 class="font-display font-bold text-xl">Create a Page</h2></div>
-                <div class="space-y-4">
-                    <input type="text" id="pageNameInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-orange-500 outline-none" placeholder="Page Name *">
-                    <select id="pageCategoryInput" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-orange-500 outline-none"><option value="Tech">Tech</option><option value="Entertainment">Entertainment</option></select>
-                    <textarea id="pageDescInput" rows="2" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-orange-500 outline-none" placeholder="Description"></textarea>
-                </div>
-                <div class="mt-6 flex gap-3">
-                    <button onclick="document.getElementById('createPageModal').classList.remove('open')" class="flex-1 border text-sm py-2 rounded-xl">Cancel</button>
-                    <button onclick="window.saveNewPage()" class="flex-1 bg-gradient-to-r from-orange-500 to-orange-400 text-white text-sm py-2 rounded-xl">Create Page</button>
+                <div class="space-y-3">
+                    <input type="text" id="pageNameInput" class="w-full rounded-xl px-3 py-2 text-sm border" style="background:var(--bg2); border-color:var(--border);" placeholder="Page Name *">
+                    <select id="pageCategoryInput" class="w-full rounded-xl px-3 py-2 text-sm border" style="background:var(--bg2); border-color:var(--border);">
+                        <option value="Tech">Tech</option><option value="Entertainment">Entertainment</option>
+                    </select>
+                    <button onclick="window.saveNewPage()" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white py-2 rounded-xl mt-2">Create Page</button>
+                    <button onclick="document.getElementById('createPageModal').classList.remove('open')" class="w-full text-sm text-[var(--muted)] pt-2">Cancel</button>
                 </div>
             </div>
         </div>
@@ -124,27 +138,31 @@
     <!-- MAIN NAVBAR -->
     <nav class="navbar" id="navbar">
         <div class="max-w-3xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="window.closePageView()">
-                    <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fas fa-link text-white text-sm"></i>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.closePageView()">
+                    <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-link text-white text-xs"></i>
                     </div>
                     <span class="logo hidden sm:block">LinkVibe</span>
                 </div>
-                
-                <!-- Chat Public Button -->
-                <button id="chatPublicBtn" class="flex items-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-100 hover:bg-orange-100 transition px-4 py-2 rounded-xl">
-                    <i class="fas fa-comments"></i> Public Chat Room
+                <button id="chatPublicBtn" class="flex items-center gap-1.5 text-xs font-medium text-orange-500 border border-orange-200 px-3 py-1.5 rounded-lg" style="background:var(--bg2);">
+                    <i class="fas fa-comments"></i> <span class="hidden sm:inline">Public Chat</span>
                 </button>
             </div>
             
             <div class="flex items-center gap-3 relative">
+                <!-- Dark Mode Toggle -->
+                <button onclick="window.toggleDarkMode()" class="text-[var(--text2)] hover:text-orange-500 transition px-2">
+                    <i id="darkModeIcon" class="fas fa-moon"></i>
+                </button>
+
                 <div id="userProfileSection"></div>
-                <div id="profileMenu" style="display:none;position:absolute;top:52px;right:0;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:190px;z-index:50;">
-                    <button onclick="window.openProfileModal()" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700"><i class="fas fa-user-edit text-orange-500 w-4 text-center"></i> Edit Profile</button>
-                    <button onclick="window.openCreatePageModal()" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-gray-50 text-gray-700"><i class="fas fa-flag text-teal-500 w-4 text-center"></i> Create Page</button>
-                    <hr class="my-1 border-gray-100">
-                    <button id="logoutBtn" class="w-full text-left flex items-center gap-3 p-2 rounded-lg text-sm hover:bg-red-50 text-red-500"><i class="fas fa-sign-out-alt w-4 text-center"></i> Logout</button>
+                
+                <div id="profileMenu" style="display:none;position:absolute;top:45px;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:160px;z-index:50;">
+                    <button onclick="window.openProfileModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-user-edit text-orange-500 w-4"></i> Edit Profile</button>
+                    <button onclick="window.openCreatePageModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-flag text-teal-500 w-4"></i> Create Page</button>
+                    <hr class="my-1 border-[var(--border)]">
+                    <button id="logoutBtn" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-red-500 hover:bg-red-50"><i class="fas fa-sign-out-alt w-4"></i> Logout</button>
                 </div>
             </div>
         </div>
@@ -155,111 +173,132 @@
         
         <!-- Page Header (Hidden on Home) -->
         <div id="activePageHeader" class="hidden mb-6 card overflow-hidden relative">
-            <button onclick="window.closePageView()" class="absolute top-4 left-4 z-20 bg-white text-gray-800 p-2 w-10 h-10 rounded-full shadow-md hover:bg-gray-50 flex items-center justify-center"><i class="fas fa-arrow-left"></i></button>
-            <div id="viewPageCover" class="h-48 w-full bg-cover bg-center bg-gray-200 relative"><div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div></div>
-            <div class="px-6 pb-6 relative -mt-12 flex flex-col items-center sm:items-start sm:flex-row gap-5">
-                <img id="viewPageLogo" class="w-28 h-28 rounded-full border-4 border-white object-cover shadow-md bg-white relative z-10">
-                <div class="mt-2 sm:mt-14 text-center sm:text-left flex-1">
-                    <h1 id="viewPageName" class="font-display font-bold text-2xl text-gray-900"></h1>
-                    <p id="viewPageCategory" class="text-sm font-medium text-orange-500 mb-2"></p>
-                    <p id="viewPageDesc" class="text-sm text-gray-600 max-w-xl leading-relaxed"></p>
+            <button onclick="window.closePageView()" class="absolute top-4 left-4 z-20 text-[var(--text)] p-2 w-8 h-8 rounded-full shadow-md flex items-center justify-center" style="background:var(--card);"><i class="fas fa-arrow-left text-sm"></i></button>
+            <div id="viewPageCover" class="h-32 w-full bg-cover bg-center relative"><div class="absolute inset-0 bg-black/40"></div></div>
+            <div class="px-5 pb-4 relative -mt-10 flex flex-col items-center sm:items-start sm:flex-row gap-4">
+                <img id="viewPageLogo" class="w-20 h-20 rounded-full border-4 object-cover shadow-md relative z-10" style="border-color:var(--card);">
+                <div class="mt-2 sm:mt-10 text-center sm:text-left flex-1">
+                    <h1 id="viewPageName" class="font-display font-bold text-xl"></h1>
+                    <p id="viewPageCategory" class="text-xs font-medium text-orange-500 mb-1"></p>
                 </div>
             </div>
         </div>
 
+        <!-- My Pages -->
         <div id="myPagesSection" class="hidden mb-6">
-            <h3 class="font-display font-bold text-lg mb-3 text-gray-800">My Pages</h3>
-            <div id="pagesContainer" class="flex gap-4 overflow-x-auto pb-4"></div>
+            <h3 class="font-display font-bold text-sm mb-3 uppercase tracking-wide text-[var(--text2)]">My Pages</h3>
+            <div id="pagesContainer" class="flex gap-3 overflow-x-auto pb-2"></div>
         </div>
 
         <!-- Post Creator -->
-        <div class="card p-5 mb-6" id="postCreatorCard">
+        <div class="card p-4 mb-6" id="postCreatorCard">
             <div class="flex items-start gap-3">
-                <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Guest&background=random" class="avatar" alt="Author">
+                <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Guest" class="avatar" alt="Author">
                 <div style="flex:1;">
-                    <div contenteditable="true" id="postText" class="outline-none min-h-[44px] py-2 text-[0.95rem] text-gray-800" data-placeholder="Kya share karna chahte ho?"></div>
+                    <div contenteditable="true" id="postText" class="outline-none min-h-[40px] py-1 text-sm text-[var(--text)]" data-placeholder="What's on your mind?"></div>
                     
-                    <div class="link-bar flex items-center gap-3 p-3 mt-2">
-                        <i class="fas fa-link text-orange-500 text-sm"></i>
-                        <input type="text" id="linkInput" placeholder="Yahan link paste karo..." oninput="window.handleLinkInput(this.value)">
-                        <button id="clearLinkBtn" class="hidden text-gray-400" onclick="window.clearLink()"><i class="fas fa-times"></i></button>
+                    <div class="link-bar flex items-center gap-2 p-2 mt-2">
+                        <i class="fas fa-link text-orange-500 text-xs ml-1"></i>
+                        <input type="text" id="linkInput" placeholder="Paste link here..." oninput="window.handleLinkInput(this.value)">
+                        <button id="clearLinkBtn" class="hidden text-[var(--muted)]" onclick="window.clearLink()"><i class="fas fa-times text-xs"></i></button>
                     </div>
-                    <div id="linkPreviewArea" style="display:none;margin-top:12px;"></div>
+                    <div id="linkPreviewArea" style="display:none;margin-top:10px;"></div>
                     
-                    <div id="imagePreviewArea" style="display:none; margin-top:12px; position:relative;">
-                        <img id="uploadedImage" src="" style="width:100%; max-height:300px; object-contain bg-gray-50; border-radius:16px; border:1px solid var(--border);">
-                        <button onclick="window.clearImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px;"><i class="fas fa-times"></i></button>
+                    <div id="imagePreviewArea" style="display:none; margin-top:10px; position:relative;">
+                        <img id="uploadedImage" src="" style="width:100%; max-height:250px; object-contain border-radius:12px; border:1px solid var(--border);">
+                        <button onclick="window.clearImage()" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; w:24px; h:24px;"><i class="fas fa-times text-xs"></i></button>
                     </div>
                     <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
                     
-                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                        <button onclick="document.getElementById('imageInput').click()" class="p-2 rounded-lg text-teal-500 hover:bg-teal-50"><i class="fas fa-image text-lg"></i></button>
-                        <button class="btn-post" id="postBtn" onclick="window.createPost()" disabled><i class="fas fa-paper-plane mr-1"></i> Post</button>
+                    <div class="flex items-center justify-between mt-3 pt-2 border-t" style="border-color:var(--border);">
+                        <button onclick="document.getElementById('imageInput').click()" class="text-teal-500 hover:text-teal-600 px-2"><i class="fas fa-image"></i></button>
+                        <button class="btn-post text-sm" id="postBtn" onclick="window.createPost()" disabled>Post</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <h3 id="feedTitle" class="font-display font-bold text-lg mb-3 text-gray-800">Global Feed</h3>
-        <div id="feedContainer"><div class="text-center text-gray-400 py-10">Loading posts...</div></div>
+        <h3 id="feedTitle" class="font-display font-bold text-sm mb-3 uppercase tracking-wide text-[var(--text2)]">Global Feed</h3>
+        <div id="feedContainer"><div class="text-center text-[var(--muted)] py-10 text-sm">Loading posts...</div></div>
     </main>
 
-    <!-- NAYA: FULL SCREEN CHAT ROOM -->
-    <div id="fullScreenChat" class="fixed inset-0 bg-gray-50 z-[200] flex flex-col">
+    <!-- FULL SCREEN CHAT ROOM -->
+    <div id="fullScreenChat" class="fixed inset-0 z-[200] flex flex-col">
         <!-- Chat Header -->
-        <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm z-10">
-            <div class="flex items-center gap-4">
-                <button onclick="window.closeChatRoom()" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-orange-100 hover:text-orange-600 transition flex items-center justify-center">
-                    <i class="fas fa-arrow-left"></i>
+        <div class="border-b px-4 py-2 flex items-center justify-between shadow-sm z-10" style="background:var(--card); border-color:var(--border);">
+            <div class="flex items-center gap-3">
+                <button onclick="window.closeChatRoom()" class="w-8 h-8 rounded-full flex items-center justify-center transition" style="background:var(--bg2); color:var(--text);">
+                    <i class="fas fa-arrow-left text-sm"></i>
                 </button>
                 <div>
-                    <h2 class="font-display font-bold text-lg leading-tight">LinkVibe Public Chat</h2>
-                    <p class="text-xs text-red-500 font-medium"><i class="fas fa-shield-alt"></i> Policy: No Abuse/Numbers. Auto-deletes in 20 mins.</p>
+                    <h2 class="font-display font-bold text-md leading-tight text-[var(--text)]">Public Chat Room</h2>
+                    <p class="text-[0.65rem] text-red-500 font-medium">Auto-deletes in 20 mins.</p>
                 </div>
             </div>
-            <!-- Mobile Toggle Active Users -->
-            <button onclick="document.getElementById('activeUsersSidebar').classList.toggle('hidden')" class="md:hidden text-gray-500 bg-gray-100 p-2 rounded-lg"><i class="fas fa-users"></i></button>
+            <div class="flex items-center gap-3">
+                <!-- NAYA: Share Link Button -->
+                <button onclick="window.shareChatLink()" class="text-teal-500 text-xs font-semibold px-2 py-1 rounded border border-teal-500 hover:bg-teal-50"><i class="fas fa-share-alt"></i> Share</button>
+                <button onclick="document.getElementById('activeUsersSidebar').classList.toggle('hidden')" class="md:hidden p-1.5 rounded-lg" style="background:var(--bg2);"><i class="fas fa-users text-sm"></i></button>
+            </div>
         </div>
 
-        <!-- Chat Layout (Sidebar + Main) -->
+        <!-- Chat Layout -->
         <div class="flex flex-1 overflow-hidden">
             
-            <!-- Left Sidebar (Active Users) -->
-            <div id="activeUsersSidebar" class="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex absolute md:relative inset-0 z-20 md:z-0">
-                <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                    <h3 class="font-bold text-sm text-gray-700">Online Now (<span id="onlineCount">0</span>/30)</h3>
-                    <button onclick="document.getElementById('activeUsersSidebar').classList.add('hidden')" class="md:hidden text-gray-500"><i class="fas fa-times"></i></button>
+            <!-- Left Sidebar (Active Users & Bots) -->
+            <div id="activeUsersSidebar" class="w-full md:w-64 border-r flex flex-col hidden md:flex absolute md:relative inset-0 z-20 md:z-0" style="background:var(--card); border-color:var(--border);">
+                <div class="p-3 border-b flex items-center justify-between" style="background:var(--bg2); border-color:var(--border);">
+                    <h3 class="font-bold text-xs text-[var(--text)]">Online (<span id="onlineCount">0</span>/30)</h3>
+                    <button onclick="document.getElementById('activeUsersSidebar').classList.add('hidden')" class="md:hidden text-[var(--muted)]"><i class="fas fa-times"></i></button>
                 </div>
-                <div id="onlineUsersList" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-2">
-                    <!-- Users rendered here -->
+                <div id="onlineUsersList" class="flex-1 overflow-y-auto chat-scroll p-2 space-y-1">
+                    <!-- Users + 10 Bots rendered here -->
                 </div>
             </div>
 
             <!-- Main Chat Area -->
-            <div class="flex-1 flex flex-col bg-[#efeae2] relative" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');">
+            <div class="flex-1 flex flex-col relative" style="background: var(--chat-bg);">
                 
                 <!-- Messages List -->
-                <div id="chatMessagesArea" class="flex-1 overflow-y-auto chat-scroll p-4 space-y-4 flex flex-col">
-                    <div class="text-center text-xs text-gray-400 my-4 bg-black/5 mx-auto px-4 py-1 rounded-full">Welcome to Public Chat! Be respectful.</div>
-                    <!-- Chat Bubbles rendered here -->
+                <!-- FIXED RIGHT SIDE CUT-OFF: Added pr-4 and restricted width inside -->
+                <div id="chatMessagesArea" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3 flex flex-col pr-4 sm:pr-6">
+                    <div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>
+                    <!-- Chat Bubbles -->
                 </div>
 
                 <!-- Chat Input Footer -->
-                <div class="bg-white border-t border-gray-200 p-3 px-4 sm:px-6">
-                    <div class="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2 border border-gray-200 focus-within:border-orange-400 focus-within:bg-white transition-all shadow-inner">
-                        <button class="text-gray-400 hover:text-orange-500 transition" onclick="document.getElementById('chatImageInput').click()"><i class="fas fa-image text-lg"></i></button>
+                <div class="border-t p-3 relative" style="background:var(--card); border-color:var(--border);">
+                    
+                    <!-- EMOJI PICKER -->
+                    <div id="emojiPicker" class="emoji-picker">
+                        <span class="emoji-item" onclick="window.addEmoji('😀')">😀</span>
+                        <span class="emoji-item" onclick="window.addEmoji('😂')">😂</span>
+                        <span class="emoji-item" onclick="window.addEmoji('😍')">😍</span>
+                        <span class="emoji-item" onclick="window.addEmoji('😎')">😎</span>
+                        <span class="emoji-item" onclick="window.addEmoji('🤔')">🤔</span>
+                        <span class="emoji-item" onclick="window.addEmoji('🔥')">🔥</span>
+                        <span class="emoji-item" onclick="window.addEmoji('👍')">👍</span>
+                        <span class="emoji-item" onclick="window.addEmoji('❤️')">❤️</span>
+                        <span class="emoji-item" onclick="window.addEmoji('🎉')">🎉</span>
+                        <span class="emoji-item" onclick="window.addEmoji('👏')">👏</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 rounded-full px-3 py-1.5 border transition-all" style="background:var(--bg2); border-color:var(--border);">
+                        <button onclick="document.getElementById('emojiPicker').classList.toggle('active')" class="text-[var(--text2)] hover:text-orange-500"><i class="far fa-smile text-lg"></i></button>
+                        <button class="text-[var(--text2)] hover:text-teal-500" onclick="document.getElementById('chatImageInput').click()"><i class="fas fa-image text-lg"></i></button>
                         <input type="file" id="chatImageInput" accept="image/*" class="hidden" onchange="window.handleChatImage(event)">
                         
-                        <input type="text" id="chatInputField" class="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 py-1" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()">
+                        <input type="text" id="chatInputField" class="flex-1 bg-transparent border-none outline-none text-sm px-1 text-[var(--text)]" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()">
                         
-                        <button onclick="window.sendChatMessage()" class="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white flex items-center justify-center hover:shadow-lg transition transform hover:scale-105">
-                            <i class="fas fa-paper-plane text-xs"></i>
+                        <button onclick="window.sendChatMessage()" class="w-7 h-7 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-[0.6rem]"></i>
                         </button>
                     </div>
-                    <!-- Image Preview for chat -->
+                    
+                    <!-- Image Preview -->
                     <div id="chatImagePreviewBox" class="hidden mt-2 relative inline-block">
-                        <img id="chatImgPreview" src="" class="h-16 rounded-xl border border-gray-300">
-                        <button onclick="window.clearChatImage()" class="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-xs"><i class="fas fa-times"></i></button>
+                        <img id="chatImgPreview" src="" class="h-12 rounded-lg border border-[var(--border)]">
+                        <button onclick="window.clearChatImage()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[0.6rem]"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
             </div>
@@ -272,9 +311,6 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ==========================================
-        // FIREBASE CONFIGURATION & ADMIN SETUP
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAt1Ovfnj8MuAf2zddjH9ShdKfQyX9vcMA",
             authDomain: "friends-tea.firebaseapp.com",
@@ -283,16 +319,10 @@
             messagingSenderId: "489214702390",
             appId: "1:489214702390:web:6a07c74a4863e08c5a3997"
         };
-
-        // YAHAN APNI EMAIL DALEIN (Is email wale user ko Delete ka button nazar aayega)
         const ADMIN_EMAIL = "admin@linkvibe.com"; 
 
         let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch(e) { console.warn("Firebase config error:", e); }
+        try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } catch(e) {}
 
         let currentUser = null; 
         let myPagesArray = []; 
@@ -300,107 +330,139 @@
         let currentContext = { type: 'home', id: null, data: null }; 
 
         // ==========================================
-        // SMART CHAT ROOM LOGIC (Policy, Filter, Auto-Delete)
+        // UI & DARK MODE LOGIC
+        // ==========================================
+        window.toggleDarkMode = function() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('darkModeIcon');
+            if(document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        // Load saved theme
+        if(localStorage.getItem('theme') === 'dark') { window.toggleDarkMode(); }
+
+        window.addEmoji = function(emoji) {
+            const input = document.getElementById('chatInputField');
+            input.value += emoji;
+            document.getElementById('emojiPicker').classList.remove('active');
+            input.focus();
+        };
+
+        window.shareChatLink = function() {
+            const chatUrl = window.location.origin + window.location.pathname + "#chat";
+            if (navigator.share) {
+                navigator.share({ title: 'Join LinkVibe Public Chat', url: chatUrl }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(chatUrl);
+                window.showToast("Chat link copied!", "success");
+            }
+        };
+
+        // ==========================================
+        // SMART CHAT ROOM (10 BOTS INCLUDED)
         // ==========================================
         let chatUnsubscribe = null;
         let onlineUnsubscribe = null;
         let pendingChatImage = null;
 
+        // 10 Dummy Bots Array
+        const dummyBots = [
+            { name: "Sara (Bot)", photo: "https://ui-avatars.com/api/?name=S&background=random" },
+            { name: "Ahmed", photo: "https://ui-avatars.com/api/?name=A&background=random" },
+            { name: "TechGuru", photo: "https://ui-avatars.com/api/?name=T&background=random" },
+            { name: "Zainab", photo: "https://ui-avatars.com/api/?name=Z&background=random" },
+            { name: "CodeNinja", photo: "https://ui-avatars.com/api/?name=C&background=random" },
+            { name: "Usman", photo: "https://ui-avatars.com/api/?name=U&background=random" },
+            { name: "Fatima", photo: "https://ui-avatars.com/api/?name=F&background=random" },
+            { name: "AI Lover", photo: "https://ui-avatars.com/api/?name=A&background=random" },
+            { name: "Bilal", photo: "https://ui-avatars.com/api/?name=B&background=random" },
+            { name: "Ayesha", photo: "https://ui-avatars.com/api/?name=A&background=random" }
+        ];
+
         document.getElementById('chatPublicBtn').addEventListener('click', () => {
-            if(!currentUser) {
-                showToast("Chat Room join karne ke liye pehle Login karein!", "error");
-                return window.openLoginModal();
-            }
-            if(!currentUser.handle) {
-                document.getElementById('profileSetupModal').classList.add('open');
-                return showToast("Pehle apna username banayein!", "info");
-            }
+            if(!currentUser) { showToast("Login required for chat!", "error"); return window.openLoginModal(); }
+            if(!currentUser.handle) { document.getElementById('profileSetupModal').classList.add('open'); return showToast("Create profile first!", "info"); }
             window.openChatRoom();
         });
 
         window.openChatRoom = async function() {
             document.getElementById('fullScreenChat').classList.add('open');
-            document.body.style.overflow = 'hidden'; // Stop background scroll
+            document.body.style.overflow = 'hidden'; 
+            window.location.hash = "chat"; // Update URL for sharing
 
-            // Join Presence
             await setDoc(doc(db, "chat_presence", currentUser.uid), {
-                uid: currentUser.uid,
-                name: currentUser.name || currentUser.handle,
-                photo: currentUser.photo || currentUser.photoURL,
-                lastSeen: serverTimestamp()
+                uid: currentUser.uid, name: currentUser.name || currentUser.handle, photo: currentUser.photo || currentUser.photoURL, lastSeen: serverTimestamp()
             });
 
-            // Listen to Online Users
             onlineUnsubscribe = onSnapshot(collection(db, "chat_presence"), (snapshot) => {
                 const list = document.getElementById('onlineUsersList');
                 list.innerHTML = '';
-                document.getElementById('onlineCount').textContent = snapshot.size;
                 
+                // Add Real Users
                 snapshot.forEach(docSnap => {
                     const user = docSnap.data();
-                    list.innerHTML += `
-                        <div class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-xl cursor-pointer transition">
-                            <div class="relative">
-                                <img src="${user.photo}" class="w-8 h-8 rounded-full object-cover border border-gray-200">
-                                <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
-                            </div>
-                            <span class="text-xs font-medium text-gray-700 truncate w-full">${user.name}</span>
-                        </div>
-                    `;
+                    list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${user.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${user.name}</span></div>`;
                 });
+
+                // Add 10 Bots
+                dummyBots.forEach(bot => {
+                    list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${bot.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${bot.name}</span></div>`;
+                });
+
+                document.getElementById('onlineCount').textContent = snapshot.size + 10;
             });
 
-            // Listen to Chat Messages
             const q = query(collection(db, "public_chat"), orderBy("createdAt", "asc"));
             chatUnsubscribe = onSnapshot(q, (snapshot) => {
                 const area = document.getElementById('chatMessagesArea');
-                area.innerHTML = '<div class="text-center text-xs text-gray-400 my-4 bg-black/5 mx-auto px-4 py-1 rounded-full">Welcome to Public Chat! Be respectful.</div>';
+                // Keep the welcome message
+                const welcomeMsg = '<div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>';
+                let messagesHTML = welcomeMsg;
                 
                 const now = Date.now();
-                const twentyMinsInMillis = 20 * 60 * 1000;
+                const twentyMins = 20 * 60 * 1000;
 
                 snapshot.forEach(docSnap => {
                     const msg = docSnap.data();
                     const msgId = docSnap.id;
                     
-                    // SOFT DELETE LOGIC: Check if message is older than 20 mins
                     if(msg.createdAt) {
                         const msgTime = msg.createdAt.toMillis();
-                        // Agar 20 min purana hai aur reported nahi hai, toh chupa do
-                        if((now - msgTime) > twentyMinsInMillis && !msg.isReported) return;
+                        if((now - msgTime) > twentyMins && !msg.isReported) return;
                     }
 
                     const isMe = msg.uid === currentUser.uid;
                     const isAdmin = currentUser.email === ADMIN_EMAIL;
                     
-                    // Tools (Report & Delete)
-                    let toolsHtml = `<button onclick="window.reportMsg('${msgId}')" title="Report" class="text-gray-400 hover:text-red-500 text-xs ml-2"><i class="fas fa-exclamation-triangle"></i></button>`;
-                    if(isAdmin || isMe) {
-                        toolsHtml += `<button onclick="window.deleteMsg('${msgId}')" title="Delete" class="text-gray-400 hover:text-red-500 text-xs ml-2"><i class="fas fa-trash"></i></button>`;
-                    }
-
-                    let mediaHtml = msg.image ? `<img src="${msg.image}" class="mt-2 rounded-xl max-h-48 object-contain">` : '';
+                    let toolsHtml = `<button onclick="window.reportMsg('${msgId}')" title="Report" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-exclamation-triangle"></i></button>`;
+                    if(isAdmin || isMe) { toolsHtml += `<button onclick="window.deleteMsg('${msgId}')" title="Delete" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-trash"></i></button>`; }
+                    let mediaHtml = msg.image ? `<img src="${msg.image}" class="mt-2 rounded-xl max-h-32 object-contain">` : '';
 
                     if(isMe) {
-                        area.innerHTML += `
-                        <div class="flex justify-end mb-4 animation-fadeIn">
-                            <div class="flex items-end flex-col">
+                        // FIXED: Added width constraints and removed extreme right sticking
+                        messagesHTML += `
+                        <div class="flex justify-end mb-3 w-full">
+                            <div class="flex items-end flex-col max-w-[85%]">
                                 <div class="flex items-center mb-1">${toolsHtml}</div>
                                 <div class="chat-bubble me shadow-sm">
-                                    <p class="whitespace-pre-wrap">${msg.text}</p>
-                                    ${mediaHtml}
+                                    <p>${msg.text}</p>${mediaHtml}
                                 </div>
                             </div>
                         </div>`;
                     } else {
-                        area.innerHTML += `
-                        <div class="flex justify-start mb-4 animation-fadeIn">
-                            <img src="${msg.authorPic}" class="w-8 h-8 rounded-full border border-gray-200 mr-2 self-end mb-1">
-                            <div class="flex items-start flex-col">
-                                <span class="text-[0.65rem] text-gray-500 mb-1 ml-1 font-medium">${msg.author}</span>
+                        messagesHTML += `
+                        <div class="flex justify-start mb-3 w-full">
+                            <img src="${msg.authorPic}" class="w-6 h-6 rounded-full border mr-2 self-end mb-1" style="border-color:var(--border);">
+                            <div class="flex items-start flex-col max-w-[85%]">
+                                <span class="text-[0.6rem] text-[var(--muted)] mb-0.5 ml-1">${msg.author}</span>
                                 <div class="chat-bubble other shadow-sm">
-                                    <p class="whitespace-pre-wrap">${msg.text}</p>
-                                    ${mediaHtml}
+                                    <p>${msg.text}</p>${mediaHtml}
                                 </div>
                                 <div class="flex items-center mt-1">${toolsHtml}</div>
                             </div>
@@ -408,109 +470,63 @@
                     }
                 });
                 
-                // Auto Scroll to bottom
+                area.innerHTML = messagesHTML;
                 area.scrollTop = area.scrollHeight;
             });
         };
 
         window.closeChatRoom = async function() {
             document.getElementById('fullScreenChat').classList.remove('open');
-            document.body.style.overflow = 'auto'; // Restore scroll
+            document.body.style.overflow = 'auto'; 
+            window.location.hash = ""; // Clear hash
             if(chatUnsubscribe) chatUnsubscribe();
             if(onlineUnsubscribe) onlineUnsubscribe();
-            if(currentUser && db) {
-                await deleteDoc(doc(db, "chat_presence", currentUser.uid)); // Mark offline
-            }
+            if(currentUser && db) { await deleteDoc(doc(db, "chat_presence", currentUser.uid)); }
         };
 
-        // WORD FILTER (Regex for Numbers and Bad Words)
         function applyWordFilter(text) {
-            let filtered = text;
-            // 1. Hide Phone Numbers (10 to 12 digits continuous)
-            filtered = filtered.replace(/\b\d{10,12}\b/g, "[Hidden Number]");
-            // 2. Hide specific bad words or politics (Add words to this list)
+            let filtered = text.replace(/\b\d{10,12}\b/g, "[Hidden Number]");
             const badWords = ["gali1", "gali2", "abuse", "politics_name"];
-            badWords.forEach(word => {
-                const regex = new RegExp(`\\b${word}\\b`, 'gi');
-                filtered = filtered.replace(regex, "***");
-            });
+            badWords.forEach(word => { const regex = new RegExp(`\\b${word}\\b`, 'gi'); filtered = filtered.replace(regex, "***"); });
             return filtered;
         }
 
-        window.handleChatImage = function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            resizeImage(file, 600, 600, (resized) => {
-                pendingChatImage = resized;
-                document.getElementById('chatImgPreview').src = resized;
-                document.getElementById('chatImagePreviewBox').classList.remove('hidden');
-            });
-        };
-        window.clearChatImage = function() {
-            pendingChatImage = null;
-            document.getElementById('chatImageInput').value = '';
-            document.getElementById('chatImagePreviewBox').classList.add('hidden');
-        };
+        window.handleChatImage = function(e) { const file = e.target.files[0]; if(!file) return; resizeImage(file, 600, 600, (resized) => { pendingChatImage = resized; document.getElementById('chatImgPreview').src = resized; document.getElementById('chatImagePreviewBox').classList.remove('hidden'); }); };
+        window.clearChatImage = function() { pendingChatImage = null; document.getElementById('chatImageInput').value = ''; document.getElementById('chatImagePreviewBox').classList.add('hidden'); };
 
         window.sendChatMessage = async function() {
             const input = document.getElementById('chatInputField');
             let rawText = input.value.trim();
-            
+            document.getElementById('emojiPicker').classList.remove('active'); // close emoji picker if open
             if(!rawText && !pendingChatImage) return;
 
-            // Apply Policy Filter
             const cleanText = applyWordFilter(rawText);
-
             input.value = '';
             const imgToUpload = pendingChatImage;
             window.clearChatImage();
 
             try {
                 await addDoc(collection(db, "public_chat"), {
-                    uid: currentUser.uid,
-                    author: currentUser.name || currentUser.handle,
-                    authorPic: currentUser.photo || currentUser.photoURL,
-                    text: cleanText,
-                    image: imgToUpload,
-                    isReported: false,
-                    createdAt: serverTimestamp()
+                    uid: currentUser.uid, author: currentUser.name || currentUser.handle, authorPic: currentUser.photo || currentUser.photoURL,
+                    text: cleanText, image: imgToUpload, isReported: false, createdAt: serverTimestamp()
                 });
-            } catch(e) { showToast("Message fail: " + e.message, "error"); }
+            } catch(e) { showToast("Message fail", "error"); }
         };
 
-        window.reportMsg = async function(msgId) {
-            if(confirm("Report this message for violating policy? It will be saved for admin review.")) {
-                await updateDoc(doc(db, "public_chat", msgId), { isReported: true });
-                showToast("Message Reported. Admin will review.", "success");
-            }
-        };
-
-        window.deleteMsg = async function(msgId) {
-            if(confirm("Delete this message?")) {
-                await deleteDoc(doc(db, "public_chat", msgId));
-            }
-        };
+        window.reportMsg = async function(msgId) { if(confirm("Report this message?")) { await updateDoc(doc(db, "public_chat", msgId), { isReported: true }); showToast("Reported.", "success"); } };
+        window.deleteMsg = async function(msgId) { if(confirm("Delete message?")) { await deleteDoc(doc(db, "public_chat", msgId)); } };
 
 
         // ==========================================
-        // REST OF THE CODE (Posts, Feeds, Logic)
-        // Everything below is identical to the previous fully working system
+        // FEED & PAGES LOGIC
         // ==========================================
-        
         window.openPageView = function(pageId) {
-            const pageData = myPagesArray.find(p => p.id === pageId);
-            if(!pageData) return;
+            const pageData = myPagesArray.find(p => p.id === pageId); if(!pageData) return;
             currentContext = { type: 'page', id: pageId, data: pageData };
-            document.getElementById('myPagesSection').classList.add('hidden');
-            document.getElementById('activePageHeader').classList.remove('hidden');
+            document.getElementById('myPagesSection').classList.add('hidden'); document.getElementById('activePageHeader').classList.remove('hidden');
             document.getElementById('viewPageCover').style.backgroundImage = `url('${pageData.cover || ''}')`;
-            document.getElementById('viewPageLogo').src = pageData.logo;
-            document.getElementById('viewPageName').textContent = pageData.name;
-            document.getElementById('viewPageCategory').textContent = pageData.category;
-            document.getElementById('viewPageDesc').textContent = pageData.description || "No description provided.";
-            document.getElementById('creatorAvatar').src = pageData.logo;
-            document.getElementById('postText').setAttribute('data-placeholder', `Post as ${pageData.name}...`);
-            document.getElementById('feedTitle').textContent = `${pageData.name}'s Posts`;
+            document.getElementById('viewPageLogo').src = pageData.logo; document.getElementById('viewPageName').textContent = pageData.name; document.getElementById('viewPageCategory').textContent = pageData.category;
+            document.getElementById('creatorAvatar').src = pageData.logo; document.getElementById('postText').setAttribute('data-placeholder', `Post as ${pageData.name}...`); document.getElementById('feedTitle').textContent = `${pageData.name}'s Posts`;
             window.renderFeed(); window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
@@ -519,70 +535,50 @@
             if(myPagesArray.length > 0) document.getElementById('myPagesSection').classList.remove('hidden');
             document.getElementById('activePageHeader').classList.add('hidden');
             if(currentUser) document.getElementById('creatorAvatar').src = currentUser.photo || currentUser.photoURL;
-            document.getElementById('postText').setAttribute('data-placeholder', "Kya share karna chahte ho?");
-            document.getElementById('feedTitle').textContent = "Global Feed";
+            document.getElementById('postText').setAttribute('data-placeholder', "What's on your mind?"); document.getElementById('feedTitle').textContent = "Global Feed";
             window.renderFeed(); 
         };
 
-        window.openCreatePageModal = () => {
-            document.getElementById('profileMenu').style.display = 'none';
-            if(!currentUser) { showToast("Pehle login karein!", "error"); return window.openLoginModal(); }
-            document.getElementById('createPageModal').classList.add('open');
-        };
-
+        window.openCreatePageModal = () => { document.getElementById('profileMenu').style.display = 'none'; if(!currentUser) { showToast("Pehle login karein!", "error"); return window.openLoginModal(); } document.getElementById('createPageModal').classList.add('open'); };
         window.handlePageLogo = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 400, 400, (resizedData) => { pageLogoData = resizedData; document.getElementById('pageLogoPreview').src = resizedData; }); };
         window.handlePageCover = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 800, 400, (resizedData) => { pageCoverData = resizedData; const coverImg = document.getElementById('pageCoverPreview'); coverImg.src = resizedData; coverImg.classList.remove('hidden'); }); };
 
         window.saveNewPage = async function() {
-            const name = document.getElementById('pageNameInput').value.trim();
-            const category = document.getElementById('pageCategoryInput').value;
-            const desc = document.getElementById('pageDescInput').value.trim();
-            if(!name) return showToast("Page ka naam likhna zaroori hai!", "error");
-
+            const name = document.getElementById('pageNameInput').value.trim(); const category = document.getElementById('pageCategoryInput').value;
+            if(!name) return showToast("Page name required!", "error");
             try {
-                const pageData = { name: name, category: category, description: desc, logo: pageLogoData || "https://ui-avatars.com/api/?name=" + name + "&background=random", cover: pageCoverData || null, adminUid: currentUser.uid, createdAt: serverTimestamp() };
-                await addDoc(collection(db, "pages"), pageData);
-                document.getElementById('createPageModal').classList.remove('open');
-                document.getElementById('pageNameInput').value = ''; document.getElementById('pageDescInput').value = ''; pageLogoData = null; pageCoverData = null; document.getElementById('pageLogoPreview').src = "https://ui-avatars.com/api/?name=P&background=f4f4f5&color=a1a1aa"; document.getElementById('pageCoverPreview').classList.add('hidden');
-                showToast("Page ban gaya!", "success");
-            } catch(e) { showToast("Error: " + e.message, "error"); }
+                await addDoc(collection(db, "pages"), { name: name, category: category, logo: pageLogoData || "https://ui-avatars.com/api/?name=" + name, cover: pageCoverData || null, adminUid: currentUser.uid, createdAt: serverTimestamp() });
+                document.getElementById('createPageModal').classList.remove('open'); document.getElementById('pageNameInput').value = ''; pageLogoData = null; pageCoverData = null; document.getElementById('pageCoverPreview').classList.add('hidden'); showToast("Page created!", "success");
+            } catch(e) { showToast("Error", "error"); }
         }
 
         function loadMyPages() {
             if(!db || !currentUser) return;
             const q = query(collection(db, "pages"), where("adminUid", "==", currentUser.uid));
             onSnapshot(q, (snapshot) => {
-                const section = document.getElementById('myPagesSection');
-                const container = document.getElementById('pagesContainer');
+                const section = document.getElementById('myPagesSection'); const container = document.getElementById('pagesContainer');
                 container.innerHTML = ''; myPagesArray = [];
                 if(snapshot.empty) { if(currentContext.type === 'home') section.classList.add('hidden'); return; }
                 snapshot.forEach((doc) => {
                     const page = { id: doc.id, ...doc.data() }; myPagesArray.push(page);
-                    container.innerHTML += `<div onclick="window.openPageView('${page.id}')" class="card p-4 flex-shrink-0 w-44 flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition border-gray-100 relative overflow-hidden group">${page.cover ? `<div class="absolute top-0 left-0 w-full h-12 bg-cover bg-center" style="background-image: url('${page.cover}')"></div>` : `<div class="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-orange-200 to-orange-100"></div>`}<img src="${page.logo}" class="w-16 h-16 rounded-full object-cover mt-4 mb-2 border-2 border-white relative z-10 shadow-sm group-hover:scale-105 transition"><h4 class="font-bold text-sm text-gray-800 truncate w-full relative z-10">${page.name}</h4><p class="text-[0.65rem] text-gray-400 relative z-10">${page.category}</p></div>`;
+                    container.innerHTML += `<div onclick="window.openPageView('${page.id}')" class="card p-3 w-36 flex flex-col items-center text-center cursor-pointer hover:shadow-lg relative overflow-hidden group">${page.cover ? `<div class="absolute top-0 left-0 w-full h-10 bg-cover bg-center" style="background-image: url('${page.cover}')"></div>` : `<div class="absolute top-0 left-0 w-full h-10 bg-gradient-to-r from-orange-200 to-orange-100"></div>`}<img src="${page.logo}" class="w-12 h-12 rounded-full object-cover mt-3 mb-1 border-2 border-white relative z-10 shadow-sm"><h4 class="font-bold text-xs text-[var(--text)] truncate w-full relative z-10">${page.name}</h4><p class="text-[0.6rem] text-[var(--muted)] relative z-10">${page.category}</p></div>`;
                 });
-                if(currentContext.type === 'home' && myPagesArray.length > 0) { section.classList.remove('hidden'); }
+                if(currentContext.type === 'home') section.classList.remove('hidden');
             });
         }
 
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            if(!auth) return showToast("Firebase error", "error");
-            try { const result = await signInWithPopup(auth, provider); window.closeLoginModal(); await checkAndCreateProfile(result.user); } catch (error) { showToast("Login Failed", "error"); }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(auth) signOut(auth); document.getElementById('profileMenu').style.display = 'none'; document.getElementById('myPagesSection').classList.add('hidden'); window.closePageView(); showToast("Logged out.", "info");
-        });
+        const provider = new GoogleAuthProvider();
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => { if(!auth) return; try { const result = await signInWithPopup(auth, provider); window.closeLoginModal(); await checkAndCreateProfile(result.user); } catch (e) { showToast("Login Failed", "error"); } });
+        document.getElementById('logoutBtn').addEventListener('click', () => { if(auth) signOut(auth); document.getElementById('profileMenu').style.display = 'none'; document.getElementById('myPagesSection').classList.add('hidden'); window.closePageView(); showToast("Logged out.", "info"); });
 
         async function checkAndCreateProfile(firebaseUser) {
-            if(!db) return;
-            const userRef = doc(db, "users", firebaseUser.uid);
-            const docSnap = await getDoc(userRef);
+            if(!db) return; const userRef = doc(db, "users", firebaseUser.uid); const docSnap = await getDoc(userRef);
             if (!docSnap.exists()) { document.getElementById('profileSetupModal').classList.add('open'); } else { currentUser = { ...firebaseUser, ...docSnap.data() }; updateNavbarUI(currentUser); loadMyPages(); }
         }
 
         document.getElementById('saveProfileBtn').addEventListener('click', async () => {
             const handle = document.getElementById('usernameInput').value.trim(); const bio = document.getElementById('bioInput').value.trim();
-            if(!handle) return showToast("Username zaroori hai!", "error");
+            if(!handle) return showToast("Username needed!", "error");
             try {
                 const newUserData = { name: auth.currentUser.displayName, email: auth.currentUser.email, photo: auth.currentUser.photoURL, handle: `@${handle.replace('@', '')}`, bio: bio, createdAt: serverTimestamp() };
                 await setDoc(doc(db, "users", auth.currentUser.uid), newUserData, { merge: true });
@@ -599,8 +595,6 @@
                         currentUser = { ...user, ...docSnap.data() }; updateNavbarUI(currentUser);
                         document.getElementById('usernameInput').value = currentUser.handle.replace('@', ''); document.getElementById('bioInput').value = currentUser.bio || '';
                         loadMyPages();
-                        
-                        // URL Hash Checking for direct chat open
                         if(window.location.hash === '#chat') { setTimeout(() => document.getElementById('chatPublicBtn').click(), 500); }
                     } else { currentUser = user; document.getElementById('profileSetupModal').classList.add('open'); updateNavbarUI(user); }
                 } else { currentUser = null; updateNavbarUI(null); window.closePageView(); }
@@ -610,30 +604,18 @@
         function updateNavbarUI(user) {
             const section = document.getElementById('userProfileSection');
             if(user) {
-                const photo = user.photo || user.photoURL || "https://ui-avatars.com/api/?name=U&background=random";
+                const photo = user.photo || user.photoURL || "https://ui-avatars.com/api/?name=U";
                 section.innerHTML = `<img src="${photo}" class="avatar cursor-pointer" onclick="window.toggleMenu()">`;
                 if(currentContext.type === 'home') document.getElementById('creatorAvatar').src = photo;
             } else {
-                section.innerHTML = `<button onclick="window.openLoginModal()" class="text-sm font-semibold bg-orange-100 text-orange-600 px-4 py-2 rounded-xl">Log In</button>`;
-                document.getElementById('creatorAvatar').src = "https://ui-avatars.com/api/?name=Guest&background=random";
+                section.innerHTML = `<button onclick="window.openLoginModal()" class="text-xs font-semibold bg-orange-100 text-orange-600 px-3 py-1.5 rounded-lg">Log In</button>`;
+                document.getElementById('creatorAvatar').src = "https://ui-avatars.com/api/?name=G";
             }
         }
 
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    let width = img.width; let height = img.height;
-                    if (width > height) { if (width > maxWidth) { height = Math.round(height *= maxWidth / width); width = maxWidth; } } 
-                    else { if (height > maxHeight) { width = Math.round(width *= maxHeight / height); height = maxHeight; } }
-                    const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                    callback(canvas.toDataURL('image/jpeg', 0.6));
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            reader.onload = function(e) { const img = new Image(); img.onload = function() { let width = img.width; let height = img.height; if (width > height) { if (width > maxWidth) { height = Math.round(height *= maxWidth / width); width = maxWidth; } } else { if (height > maxHeight) { width = Math.round(width *= maxHeight / height); height = maxHeight; } } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', 0.6)); }; img.src = e.target.result; }; reader.readAsDataURL(file);
         }
 
         window.handleLinkInput = function(value) {
@@ -641,12 +623,11 @@
             if (value.trim() === '') { clearBtn.classList.add('hidden'); previewArea.style.display = 'none'; currentLinkPreview = null; isPreviewLoading = false; window.updatePostBtn(); return; }
             clearBtn.classList.remove('hidden');
             if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(value.trim())) {
-                isPreviewLoading = true; window.updatePostBtn();
-                previewArea.style.display = 'block'; previewArea.innerHTML = `<div class="link-preview pointer-events-none"><div class="shimmer" style="height:150px;"></div><div class="p-3"><div class="shimmer h-3 w-20 rounded mb-2"></div><div class="shimmer h-4 w-full rounded"></div></div></div>`;
+                isPreviewLoading = true; window.updatePostBtn(); previewArea.style.display = 'block'; previewArea.innerHTML = `<div class="text-xs text-[var(--muted)]">Loading preview...</div>`;
                 previewTimeout = setTimeout(() => {
                     const domain = value.trim().replace(/^https?:\/\//, '').split('/')[0];
-                    currentLinkPreview = { url: value.trim(), domain: domain, title: "Shared Web Link", desc: "Click to visit this resource.", image: `https://picsum.photos/seed/${domain}/600/300.jpg` };
-                    previewArea.innerHTML = `<div class="link-preview" onclick="window.open('${currentLinkPreview.url}', '_blank')"><img src="${currentLinkPreview.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${domain}</div><div class="link-preview-title">${currentLinkPreview.title}</div></div></div>`;
+                    currentLinkPreview = { url: value.trim(), domain: domain, title: "Shared Link", image: `https://picsum.photos/seed/${domain}/600/300.jpg` };
+                    previewArea.innerHTML = `<div class="link-preview" onclick="window.open('${currentLinkPreview.url}', '_blank')"><img src="${currentLinkPreview.image}" class="link-preview-img"><div class="p-2 text-xs"><div class="text-teal-500"><i class="fas fa-globe"></i> ${domain}</div></div></div>`;
                     isPreviewLoading = false; window.updatePostBtn();
                 }, 800);
             }
@@ -660,49 +641,40 @@
 
         window.createPost = async function() {
             if(!currentUser) return window.openLoginModal();
-            if(!currentUser.handle && currentContext.type === 'home') { document.getElementById('profileSetupModal').classList.add('open'); return showToast("Pehle apna username select karein!", "info"); }
-
+            if(!currentUser.handle && currentContext.type === 'home') { document.getElementById('profileSetupModal').classList.add('open'); return showToast("Create profile first!", "info"); }
             const text = document.getElementById('postText').textContent.trim(); document.getElementById('postBtn').disabled = true;
             const isPagePost = currentContext.type === 'page';
             const postData = { text: text, author: isPagePost ? currentContext.data.name : (currentUser.name || currentUser.displayName), authorHandle: isPagePost ? currentContext.data.category : currentUser.handle, authorPic: isPagePost ? currentContext.data.logo : (currentUser.photo || currentUser.photoURL), pageId: isPagePost ? currentContext.id : null, link: currentLinkPreview || null, image: currentImagePreview || null, createdAt: serverTimestamp() };
-
-            if(db) { try { await addDoc(collection(db, "posts"), postData); showToast("Post Live Ho Gayi!", "success"); resetForm(); } catch(e) { showToast("Post fail: " + e.message, "error"); window.updatePostBtn(); } }
+            if(db) { try { await addDoc(collection(db, "posts"), postData); showToast("Posted!", "success"); document.getElementById('postText').textContent = ''; window.clearLink(); window.clearImage(); } catch(e) { window.updatePostBtn(); } }
         };
-
-        function resetForm() { document.getElementById('postText').textContent = ''; window.clearLink(); window.clearImage(); }
 
         if(db) {
             const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                allPostsArray = [];
-                snapshot.forEach((doc) => { const data = doc.data(); if(data.author && data.author !== 'undefined') allPostsArray.push({id: doc.id, ...data}); });
-                window.renderFeed();
-            });
+            onSnapshot(q, (snapshot) => { allPostsArray = []; snapshot.forEach((doc) => { const data = doc.data(); if(data.author && data.author !== 'undefined') allPostsArray.push({id: doc.id, ...data}); }); window.renderFeed(); });
         }
 
-        window.toggleLike = function(btn) { const dislikeBtn = btn.nextElementSibling; if(dislikeBtn.classList.contains('text-red-600')) { dislikeBtn.classList.remove('text-red-600', 'bg-red-50'); } btn.classList.toggle('text-blue-600'); btn.classList.toggle('bg-blue-50'); };
-        window.toggleDislike = function(btn) { const likeBtn = btn.previousElementSibling; if(likeBtn.classList.contains('text-blue-600')) { likeBtn.classList.remove('text-blue-600', 'bg-blue-50'); } btn.classList.toggle('text-red-600'); btn.classList.toggle('bg-red-50'); };
-        window.toggleComment = function(postId) { const commentSection = document.getElementById(`comment-section-${postId}`); if(commentSection) { commentSection.classList.toggle('hidden'); if(!commentSection.classList.contains('hidden')) { commentSection.querySelector('input').focus(); } } };
-        window.sharePost = function(text, url) { if (navigator.share) { navigator.share({ title: 'LinkVibe Post', text: text, url: url || window.location.href, }).catch((error) => console.log('Error sharing', error)); } else { navigator.clipboard.writeText(window.location.href); window.showToast("Post link copied to clipboard!", "success"); } };
+        window.toggleLike = function(btn) { const dislikeBtn = btn.nextElementSibling; if(dislikeBtn.classList.contains('text-red-500')) { dislikeBtn.classList.remove('text-red-500'); } btn.classList.toggle('text-blue-500'); };
+        window.toggleDislike = function(btn) { const likeBtn = btn.previousElementSibling; if(likeBtn.classList.contains('text-blue-500')) { likeBtn.classList.remove('text-blue-500'); } btn.classList.toggle('text-red-500'); };
+        window.toggleComment = function(postId) { const commentSection = document.getElementById(`comment-section-${postId}`); if(commentSection) { commentSection.classList.toggle('hidden'); if(!commentSection.classList.contains('hidden')) commentSection.querySelector('input').focus(); } };
+        window.sharePost = function(text, url) { if (navigator.share) { navigator.share({ title: 'LinkVibe Post', text: text, url: url || window.location.href }); } else { navigator.clipboard.writeText(window.location.href); window.showToast("Link copied!", "success"); } };
 
         window.renderFeed = function() {
             const container = document.getElementById('feedContainer'); container.innerHTML = '';
-            let postsToShow = allPostsArray;
-            if(currentContext.type === 'page') { postsToShow = allPostsArray.filter(p => p.pageId === currentContext.id); }
-            if(postsToShow.length === 0) { container.innerHTML = '<div class="text-center text-gray-400 py-10">Koi post nahi mili.</div>'; return; }
+            let postsToShow = allPostsArray; if(currentContext.type === 'page') { postsToShow = allPostsArray.filter(p => p.pageId === currentContext.id); }
+            if(postsToShow.length === 0) { container.innerHTML = '<div class="text-center text-[var(--muted)] py-10 text-sm">No posts yet.</div>'; return; }
 
             postsToShow.forEach((post) => {
                 let mediaHTML = '';
-                if(post.link) { mediaHTML = `<div class="link-preview mt-3" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-3"><div class="text-xs text-teal-500 font-medium mb-1"><i class="fas fa-globe"></i> ${post.link.domain}</div><div class="link-preview-title">${post.link.title}</div></div></div>`; } 
-                else if(post.image) { mediaHTML = `<img src="${post.image}" class="mt-3 w-full bg-gray-50 object-contain rounded-xl border border-gray-100" style="max-height: 500px;">`; }
-                const handleDisplay = post.authorHandle && post.authorHandle !== 'undefined' ? `<div class="text-[0.78rem] text-gray-400">${post.authorHandle}</div>` : `<div class="text-[0.78rem] text-gray-400">Just Now</div>`;
+                if(post.link) { mediaHTML = `<div class="link-preview mt-2" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-2 text-xs"><div class="text-teal-500"><i class="fas fa-globe"></i> ${post.link.domain}</div></div></div>`; } 
+                else if(post.image) { mediaHTML = `<img src="${post.image}" class="mt-2 w-full object-contain rounded-xl border border-[var(--border)]" style="max-height: 400px; background:var(--bg2);">`; }
+                const handleDisplay = post.authorHandle && post.authorHandle !== 'undefined' ? `<div class="text-[0.7rem] text-[var(--muted)]">${post.authorHandle}</div>` : `<div class="text-[0.7rem] text-[var(--muted)]">Just Now</div>`;
                 const textDisplay = post.text && post.text !== 'undefined' ? post.text : '';
                 const pageBadge = (currentContext.type === 'home' && post.pageId) ? `<i class="fas fa-check-circle text-teal-500 text-xs ml-1" title="Official Page"></i>` : '';
 
-                const actionButtons = `<div class="border-t border-gray-100 mt-4 pt-3 flex items-center justify-between text-gray-500"><div class="flex gap-2 sm:gap-4"><button onclick="window.toggleLike(this)" class="transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-up"></i> <span class="text-xs font-medium hidden sm:inline">Like</span></button><button onclick="window.toggleDislike(this)" class="transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-thumbs-down"></i> <span class="text-xs font-medium hidden sm:inline">Dislike</span></button><button onclick="window.toggleComment('${post.id}')" class="hover:text-teal-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-comment"></i> <span class="text-xs font-medium hidden sm:inline">Comment</span></button></div><button onclick="window.sharePost('${textDisplay.substring(0, 30)}...')" class="hover:text-green-500 transition flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-gray-50"><i class="fas fa-share"></i> <span class="text-xs font-medium hidden sm:inline">Share</span></button></div><div id="comment-section-${post.id}" class="hidden mt-3 pt-3 border-t border-gray-50"><div class="flex items-center gap-2"><img src="${currentUser ? (currentUser.photo || currentUser.photoURL) : 'https://ui-avatars.com/api/?name=Guest'}" class="w-8 h-8 rounded-full border border-gray-200"><input type="text" placeholder="Write a comment..." class="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-1.5 text-sm outline-none focus:border-teal-500 transition" onkeypress="if(event.key === 'Enter') { this.value=''; window.showToast('Comment posted!', 'success'); window.toggleComment('${post.id}'); }"></div></div>`;
-                const followBtn = `<button onclick="window.showToast('Followed ${post.author}!', 'success')" class="text-orange-500 text-xs font-semibold hover:bg-orange-50 px-3 py-1.5 rounded-full border border-orange-500 transition"><i class="fas fa-plus"></i> Follow</button>`;
+                const actionButtons = `<div class="border-t mt-3 pt-2 flex items-center justify-between text-[var(--text2)]" style="border-color:var(--border);"><div class="flex gap-4"><button onclick="window.toggleLike(this)" class="transition flex items-center gap-1.5"><i class="fas fa-thumbs-up"></i> <span class="text-xs hidden sm:inline">Like</span></button><button onclick="window.toggleDislike(this)" class="transition flex items-center gap-1.5"><i class="fas fa-thumbs-down"></i> <span class="text-xs hidden sm:inline">Dislike</span></button><button onclick="window.toggleComment('${post.id}')" class="hover:text-teal-500 transition flex items-center gap-1.5"><i class="fas fa-comment"></i> <span class="text-xs hidden sm:inline">Comment</span></button></div><button onclick="window.sharePost('${textDisplay.substring(0, 30)}...')" class="hover:text-green-500 transition flex items-center gap-1.5"><i class="fas fa-share"></i> <span class="text-xs hidden sm:inline">Share</span></button></div><div id="comment-section-${post.id}" class="hidden mt-3"><div class="flex items-center gap-2"><img src="${currentUser ? (currentUser.photo || currentUser.photoURL) : 'https://ui-avatars.com/api/?name=G'}" class="w-6 h-6 rounded-full"><input type="text" placeholder="Write a comment..." class="flex-1 bg-transparent border-b outline-none text-xs py-1" style="border-color:var(--border); color:var(--text);" onkeypress="if(event.key === 'Enter') { this.value=''; window.showToast('Comment posted!', 'success'); window.toggleComment('${post.id}'); }"></div></div>`;
+                const followBtn = `<button onclick="window.showToast('Followed ${post.author}!', 'success')" class="text-orange-500 text-[0.65rem] font-semibold border border-orange-500 px-2 py-1 rounded-full"><i class="fas fa-plus"></i> Follow</button>`;
 
-                container.innerHTML += `<article class="card p-5 mb-4 animation-fadeIn"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3"><img src="${post.authorPic}" class="avatar"><div><div class="font-bold text-[0.95rem] font-display flex items-center">${post.author} ${pageBadge}</div>${handleDisplay}</div></div>${followBtn}</div><p class="text-[0.92rem] leading-relaxed text-gray-800 whitespace-pre-wrap">${textDisplay}</p>${mediaHTML}${actionButtons}</article>`;
+                container.innerHTML += `<article class="card p-4 mb-4"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><img src="${post.authorPic}" class="w-8 h-8 rounded-full object-cover"><div><div class="font-bold text-sm font-display flex items-center text-[var(--text)]">${post.author} ${pageBadge}</div>${handleDisplay}</div></div>${followBtn}</div><p class="text-[0.85rem] leading-relaxed whitespace-pre-wrap text-[var(--text)]">${textDisplay}</p>${mediaHTML}${actionButtons}</article>`;
             });
         }
 
@@ -710,7 +682,7 @@
         window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('open');
         window.openProfileModal = () => { document.getElementById('profileMenu').style.display = 'none'; if(!currentUser) return window.openLoginModal(); document.getElementById('profileSetupModal').classList.add('open'); };
         window.toggleMenu = () => { const m = document.getElementById('profileMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; };
-        window.showToast = function(message, type = 'info') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast`; const icon = type === 'success' ? 'fa-check-circle text-teal-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-orange-500'; toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+        window.showToast = function(message, type = 'info') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast`; const icon = type === 'success' ? 'fa-check-circle text-teal-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-orange-500'; toast.innerHTML = `<i class="fas ${icon}"></i><span class="text-sm">${message}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
     </script>
 </body>
 </html>

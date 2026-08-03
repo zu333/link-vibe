@@ -1,274 +1,441 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkVibe — Social Hub & Chat</title>
+    <title>Friends Flow — Professional Network</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Free AI Image Moderation Scripts (TensorFlow & NSFWJS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.2.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/nsfwjs@2.9.0/dist/nsfwjs.min.js"></script>
+
     <style>
         :root {
-            /* Light Mode Variables */
-            --bg: #FFF8F3; --bg2: #FFF1E8; --card: #FFFFFF;
-            --accent: #E8613C; --accent2: #F4A261;
-            --text: #2D2A32; --text2: #6B6574; --muted: #B0A9B9;
-            --border: #F0E6DE;
-            --shadow: 0 4px 24px rgba(232, 97, 60, 0.08);
-            --chat-bg: #efeae2;
-        }
-
-        /* Dark Mode Variables */
-        body.dark-mode {
-            --bg: #121212; --bg2: #1e1e1e; --card: #1e1e1e;
-            --text: #e0e0e0; --text2: #a0a0a0; --muted: #666;
-            --border: #333333;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-            --chat-bg: #1a1a1a;
+            --bg: #F7F6F3;
+            --bg2: #EFEDE8;
+            --card: #FFFFFF;
+            --accent: #1B6B5A;
+            --accent-hover: #145446;
+            --accent-light: rgba(27,107,90,0.07);
+            --accent-glow: rgba(27,107,90,0.13);
+            --text: #1A1A1A;
+            --text2: #2D2D2D;
+            --muted: #7A7A7A;
+            --border: #E2E0DA;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            --shadow-lg: 0 4px 24px rgba(0,0,0,0.06);
+            --gradient-hero: linear-gradient(135deg, #1B6B5A 0%, #2A9D8F 50%, #43B8A0 100%);
+            --danger: #E74C3C;
+            --warning: #F39C12;
+            --success: #2ECC71;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
-        h1, h2, h3, h4, h5, h6, .font-display { font-family: 'Outfit', sans-serif; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-        /* Navbar & Utilities */
-        .navbar { position: sticky; top: 0; z-index: 100; background: var(--card); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; transition: all 0.3s; }
-        .logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* Smaller Avatars */
-        .avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
-        .card { background: var(--card); border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s; }
-        .link-bar { background: var(--bg2); border-radius: 16px; border: 1px dashed var(--border); overflow: hidden; }
-        .link-bar input { background: transparent; border: none; outline: none; width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.9rem; color: var(--text); }
-        .btn-post { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 12px; padding: 0.5rem 1.2rem; font-family: 'Outfit', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .btn-post:disabled { opacity: 0.5; cursor: not-allowed; }
+        .font-display { font-family: 'Playfair Display', serif; }
 
-        /* Modals & Effects */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 300; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .separate-posts-scroll { max-height: calc(100vh - 200px); min-height: 400px; overflow-y: auto !important; scroll-behavior: smooth; }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+        .navbar { position: sticky; top: 0; z-index: 200; background: rgba(255,255,255,0.95); border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); transition: all 0.3s; }
+        .navbar-inner { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1.5rem; }
+
+        .logo { font-weight: 800; font-size: 1.5rem; color: var(--accent); letter-spacing: -0.8px; display: flex; align-items: center; gap: 2px; cursor: pointer; user-select: none; }
+        .logo .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; display: inline-block; animation: pulse-dot 2s infinite; margin-left: 1px; }
+        @keyframes pulse-dot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.6; } }
+
+        .nav-icon-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--muted); transition: all 0.2s; padding: 6px 12px; border-radius: 8px; position: relative; border: none; background: none; cursor: pointer; font-family: inherit; }
+        .nav-icon-btn:hover { color: var(--accent); background: var(--accent-light); }
+        .nav-icon-btn.active { color: var(--accent); }
+        .nav-icon-btn .nav-label { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
+        .nav-icon-btn .badge { position: absolute; top: 2px; right: 4px; width: 16px; height: 16px; background: var(--danger); color: white; font-size: 0.55rem; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        .search-box { display: flex; align-items: center; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 0 14px; transition: all 0.25s; }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); background: var(--card); }
+        .search-box input { background: transparent !important; border: none !important; outline: none; font-size: 0.85rem; padding: 8px 0; width: 200px; color: var(--text); font-family: inherit; }
+        .search-box input::placeholder { color: var(--muted); }
+
+        .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); transition: all 0.3s ease; }
+        .card:hover { box-shadow: var(--shadow-lg); }
+
+        .btn-primary { background: var(--accent); color: white; border: none; border-radius: 10px; padding: 0.55rem 1.4rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.2px; font-family: inherit; }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px var(--accent-glow); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-ghost { color: var(--muted); font-weight: 600; padding: 0.5rem 0.8rem; border-radius: 8px; transition: all 0.2s; background: transparent; border: none; cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .btn-ghost:hover { background: var(--accent-light); color: var(--accent); }
+
+        .btn-outline { color: var(--muted); font-weight: 600; padding: 0.5rem 0.8rem; border-radius: 8px; transition: all 0.2s; background: transparent; border: 1px solid var(--border); cursor: pointer; font-size: 0.82rem; font-family: inherit; }
+        .btn-outline:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+        .btn-danger { background: var(--danger); color: white; border: none; border-radius: 10px; padding: 0.55rem 1.4rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+        .btn-danger:hover { background: #C0392B; transform: translateY(-1px); }
+
+        .btn-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0.7rem; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; color: var(--text); font-family: inherit; }
+        .btn-google:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); z-index: 1000000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content { background: var(--card); border-radius: 20px; padding: 1.5rem; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); transform: scale(0.9); transition: transform 0.3s; text-align: center; max-height: 90vh; overflow-y: auto; color: var(--text); }
-        .modal-overlay.open .modal-content { transform: scale(1); }
+        .modal-content { background: var(--card); border-radius: 16px; width: 100%; max-width: 460px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); transform: translateY(-30px) scale(0.95); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); display: flex; flex-direction: column; overflow: hidden; }
+        .modal-overlay.open .modal-content { transform: translateY(0) scale(1); }
+        .modal-header { padding: 1.25rem 1.75rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .modal-body { padding: 1.75rem; overflow-y: auto; max-height: 70vh; }
+        .modal-footer { padding: 1rem 1.75rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* Chat Specific Scrollbar */
-        .chat-scroll::-webkit-scrollbar { width: 5px; }
-        .chat-scroll::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 10px; }
+        .profile-sidebar-card .cover { height: 56px; background: var(--gradient-hero); border-radius: 12px 12px 0 0; position: relative; overflow: hidden; }
+        .profile-sidebar-card .cover::after { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-4v4h4zm0-16v-4h-4v4h4zm-8 8v-4h-4v4h4zm16 0v-4h-4v4h4zm-8-8v-4h-4v4h4zm-8-8v-4h-4v4h4zm16 0v-4h-4v4h4zm-8 16v-4h-4v4h4zm-8 8v-4h-4v4h4zm16-8v-4h-4v4h4zm0 8v-4h-4v4h4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+        .profile-sidebar-card .avatar-wrap { margin-top: -28px; display: flex; justify-content: center; position: relative; z-index: 2; }
+        .profile-sidebar-card .avatar-wrap img { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--card); object-fit: cover; }
 
-        /* Full Screen Chat Animation */
-        #fullScreenChat { transition: transform 0.4s ease-in-out; transform: translateY(100%); background: var(--bg); }
-        #fullScreenChat.open { transform: translateY(0); }
-        
-        /* Chat Bubble Fixes */
-        .chat-bubble { max-width: 85%; padding: 8px 12px; border-radius: 16px; position: relative; font-size: 0.88rem; line-height: 1.4; word-wrap: break-word; }
-        .chat-bubble.me { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border-bottom-right-radius: 4px; }
-        .chat-bubble.other { background: var(--bg2); color: var(--text); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
-        
-        /* Text inputs in dark mode */
-        input, textarea, select { color: var(--text); background: var(--bg2); border-color: var(--border); }
-        
-        /* Emoji Picker */
-        .emoji-picker { display: none; position: absolute; bottom: 60px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; box-shadow: var(--shadow); width: 220px; z-index: 50; }
-        .emoji-picker.active { display: flex; flex-wrap: wrap; gap: 8px; }
-        .emoji-item { cursor: pointer; font-size: 1.2rem; transition: transform 0.1s; }
-        .emoji-item:hover { transform: scale(1.2); }
+        .post-card { border-radius: 12px; overflow: hidden; transition: all 0.25s ease; }
+        .post-card:hover { box-shadow: var(--shadow-lg); }
+        .post-action-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); transition: all 0.2s; cursor: pointer; border: none; background: none; font-family: inherit; }
+        .post-action-btn:hover { background: var(--accent-light); color: var(--accent); }
+        .post-action-btn.liked { color: var(--accent); }
+        .post-action-btn.liked i { animation: like-pop 0.35s ease; }
+        @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+        input, textarea, select { color: var(--text) !important; background: var(--bg) !important; border: 1.5px solid var(--border) !important; border-radius: 10px; transition: all 0.2s; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--accent) !important; outline: none; box-shadow: 0 0 0 3px var(--accent-glow) !important; }
+        input::placeholder, textarea::placeholder { color: var(--muted) !important; }
+
+        .toast-container { position: fixed; bottom: 24px; left: 24px; z-index: 999999 !important; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-lg); animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .dropdown-menu { position: absolute; top: calc(100% + 8px); right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; width: 200px; z-index: 300; opacity: 0; pointer-events: none; transform: translateY(-8px); transition: all 0.2s ease; }
+        .dropdown-menu.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .dropdown-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 14px; font-size: 0.85rem; font-weight: 500; color: var(--text); border: none; background: none; cursor: pointer; border-radius: 8px; transition: all 0.15s; font-family: inherit; }
+        .dropdown-item:hover { background: var(--accent-light); color: var(--accent); }
+        .dropdown-item.danger { color: var(--danger); }
+        .dropdown-item.danger:hover { background: rgba(231,76,60,0.08); }
+
+        .status-online { width: 10px; height: 10px; background: var(--success); border-radius: 50%; border: 2px solid var(--card); position: absolute; bottom: 0; right: 0; }
+
+        .fade-in { animation: fadeIn 0.4s ease both; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .news-item { padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .news-item:hover { background: var(--accent-light); }
+        .news-item:hover h4 { color: var(--accent); }
+
+        .user-list-item { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+        .user-list-item:hover { background: var(--accent-light); }
+
+        .profile-setup-cover { height: 80px; background: var(--gradient-hero); border-radius: 16px 16px 0 0; position: relative; }
+        .profile-setup-cover::after { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-4v4h4zm0-16v-4h-4v4h4zm-8 8v-4h-4v4h4zm16 0v-4h-4v4h4zm-8-8v-4h-4v4h4zm-8-8v-4h-4v4h4zm16 0v-4h-4v4h4zm-8 16v-4h-4v4h4zm-8 8v-4h-4v4h4zm16-8v-4h-4v4h4zm0 8v-4h-4v4h4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); border-radius: 16px 16px 0 0; }
+
+        .time-ago { font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+        .time-ago::before { content: '·'; margin: 0 2px; }
+
+        .link-preview { display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin-top: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; text-decoration: none; color: var(--accent); font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+        .link-preview:hover { background: var(--accent-light); border-color: var(--accent); }
+
+        .link-input-area { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+        .link-input-area input { flex: 1; font-size: 0.85rem; padding: 8px 12px; }
+        .link-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-light); color: var(--accent); border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 6px; }
+        .link-tag button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.8rem; padding: 0; font-family: inherit; }
+
+        /* Admin panel styles */
+        .admin-sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
+        .admin-sidebar-link:hover, .admin-sidebar-link.active { background: var(--accent-light); color: var(--accent); }
+        .admin-sidebar-link i { width: 20px; text-align: center; }
+
+        .admin-stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+        .admin-stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+        .admin-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .admin-table th { text-align: left; padding: 12px 16px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+        .admin-table td { padding: 12px 16px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+        .admin-table tr:hover td { background: var(--accent-light); }
+
+        .admin-toggle { width: 44px; height: 24px; border-radius: 12px; background: var(--border); position: relative; cursor: pointer; transition: background 0.2s; border: none; }
+        .admin-toggle.on { background: var(--accent); }
+        .admin-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: white; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .admin-toggle.on::after { transform: translateX(20px); }
+
+        @media (max-width: 768px) {
+            .search-box input { width: 120px; }
+            .navbar-inner { padding: 0.5rem 1rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
     </style>
 </head>
-<body class="transition-colors duration-300">
+<body>
 
-    <!-- Toast Container -->
-    <div class="toast-container fixed top-20 right-5 z-[9999] flex flex-col gap-2" id="toastContainer"></div>
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- Login Modal -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-content">
-            <h2 class="font-display font-bold text-2xl mb-2">Welcome to LinkVibe</h2>
-            <p class="text-sm text-[var(--text2)] mb-6">Aage barhne ke liye login karein.</p>
-            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition font-medium" style="background:var(--bg2); border-color:var(--border);">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;">
-                Continue with Google
-            </button>
-            <button onclick="window.closeLoginModal()" class="mt-4 text-sm text-[var(--muted)] hover:text-[var(--text)]">Cancel</button>
+            <div class="profile-setup-cover"></div>
+            <div style="margin-top:-30px; display:flex; justify-content:center; position:relative; z-index:2;">
+                <div style="width:60px; height:60px; background:var(--gradient-hero); border-radius:16px; display:flex; align-items:center; justify-content:center; border:3px solid var(--card); box-shadow: var(--shadow-lg);">
+                    <i class="fas fa-users" style="color:white; font-size:1.4rem;"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center space-y-5" style="padding-top:1.2rem;">
+                <div>
+                    <h2 class="font-display text-2xl font-bold mb-2">Welcome Back</h2>
+                    <p class="text-sm" style="color:var(--muted);">Sign in to your professional network and stay connected.</p>
+                </div>
+                <button id="googleLoginBtn" class="btn-google">
+                    <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    <span>Continue with Google</span>
+                </button>
+                <p class="text-xs" style="color:var(--muted); line-height:1.6;">By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+            </div>
+            <div class="modal-footer justify-center" style="border-top:none; padding-top:0;">
+                <button onclick="window.closeLoginModal()" class="btn-ghost text-xs">Maybe later</button>
+            </div>
         </div>
     </div>
 
     <!-- Profile Setup Modal -->
     <div class="modal-overlay" id="profileSetupModal">
-        <div class="modal-content" style="max-width: 450px;">
-            <h2 class="font-display font-bold text-2xl mb-2">Your Profile</h2>
-            <div class="text-left mb-4">
-                <label class="block text-sm font-medium mb-1">Username (Handle)</label>
-                <div class="flex items-center rounded-xl px-3 py-2 border" style="background:var(--bg2); border-color:var(--border);">
-                    <span class="text-[var(--muted)] mr-1">@</span>
-                    <input type="text" id="usernameInput" class="bg-transparent outline-none w-full text-sm" placeholder="ali_dev">
-                </div>
+        <div class="modal-content">
+            <div class="profile-setup-cover"></div>
+            <div class="modal-header" style="border-bottom:none; padding-top:0.8rem;">
+                <h2 class="font-bold text-lg">Complete Your Profile</h2>
+                <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="btn-ghost" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
             </div>
-            <div class="text-left mb-6">
-                <label class="block text-sm font-medium mb-1">Bio (Optional)</label>
-                <textarea id="bioInput" rows="2" class="w-full rounded-xl p-3 outline-none text-sm border" style="background:var(--bg2); border-color:var(--border);"></textarea>
-            </div>
-            <button id="saveProfileBtn" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white font-semibold py-3 rounded-xl transition">Save Profile</button>
-            <button onclick="document.getElementById('profileSetupModal').classList.remove('open')" class="mt-3 text-sm text-[var(--muted)] w-full">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Create Page Modal -->
-    <div class="modal-overlay" id="createPageModal">
-        <div class="modal-content" style="max-width: 450px; padding:0;">
-            <div class="relative h-28 cursor-pointer group" onclick="document.getElementById('pageCoverInput').click()" style="background:var(--bg2);">
-                <img id="pageCoverPreview" src="" class="absolute inset-0 w-full h-full object-cover hidden">
-                <span class="absolute bottom-2 right-2 text-xs text-white bg-black/50 px-2 py-1 rounded">Add Cover</span>
-                <input type="file" id="pageCoverInput" accept="image/*" class="hidden" onchange="window.handlePageCover(event)">
-            </div>
-            <div class="px-5 pb-5 relative">
-                <div class="relative -mt-10 mb-4 w-20 h-20 rounded-full border-4 cursor-pointer mx-auto" onclick="document.getElementById('pageLogoInput').click()" style="border-color:var(--card); background:var(--bg2);">
-                    <img id="pageLogoPreview" src="https://ui-avatars.com/api/?name=P" class="w-full h-full rounded-full object-cover">
-                    <input type="file" id="pageLogoInput" accept="image/*" class="hidden" onchange="window.handlePageLogo(event)">
-                </div>
-                <div class="space-y-3">
-                    <input type="text" id="pageNameInput" class="w-full rounded-xl px-3 py-2 text-sm border" style="background:var(--bg2); border-color:var(--border);" placeholder="Page Name *">
-                    <select id="pageCategoryInput" class="w-full rounded-xl px-3 py-2 text-sm border" style="background:var(--bg2); border-color:var(--border);">
-                        <option value="Tech">Tech</option><option value="Entertainment">Entertainment</option>
-                    </select>
-                    <button onclick="window.saveNewPage()" class="w-full bg-gradient-to-r from-orange-500 to-orange-400 text-white py-2 rounded-xl mt-2">Create Page</button>
-                    <button onclick="document.getElementById('createPageModal').classList.remove('open')" class="w-full text-sm text-[var(--muted)] pt-2">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAIN NAVBAR -->
-    <nav class="navbar" id="navbar">
-        <div class="max-w-3xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="window.closePageView()">
-                    <div style="width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                        <i class="fas fa-link text-white text-xs"></i>
+            <div class="modal-body space-y-5" style="padding-top:0.5rem;">
+                <div class="flex flex-col items-center">
+                    <div style="position:relative;">
+                        <img id="profileAvatarPreview" src="https://ui-avatars.com/api/?name=User&background=1B6B5A&color=fff&size=128" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--border); cursor:pointer;" onclick="document.getElementById('userAvatarFileInput').click()">
+                        <div style="position:absolute; bottom:0; right:0; width:28px; height:28px; background:var(--accent); border-radius:50%; border:2px solid var(--card); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="document.getElementById('userAvatarFileInput').click()">
+                            <i class="fas fa-camera" style="color:white; font-size:0.65rem;"></i>
+                        </div>
                     </div>
-                    <span class="logo hidden sm:block">LinkVibe</span>
+                    <input type="file" id="userAvatarFileInput" accept="image/*" class="hidden" onchange="window.handleProfileAvatarUpload(event)">
+                    <span class="text-xs font-semibold mt-2 cursor-pointer" style="color:var(--accent);" onclick="document.getElementById('userAvatarFileInput').click()">Add Photo</span>
                 </div>
-                <button id="chatPublicBtn" class="flex items-center gap-1.5 text-xs font-medium text-orange-500 border border-orange-200 px-3 py-1.5 rounded-lg" style="background:var(--bg2);">
-                    <i class="fas fa-comments"></i> <span class="hidden sm:inline">Public Chat</span>
-                </button>
+                <div>
+                    <label class="block text-xs font-bold mb-1.5 uppercase tracking-wider" style="color:var(--muted);">Full Name</label>
+                    <input type="text" id="displayNameInput" class="w-full p-2.5 text-sm" placeholder="e.g. Priya Sharma">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1.5 uppercase tracking-wider" style="color:var(--muted);">Headline</label>
+                    <input type="text" id="usernameInput" class="w-full p-2.5 text-sm" placeholder="Senior Developer at TechCorp">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1.5 uppercase tracking-wider" style="color:var(--muted);">About</label>
+                    <textarea id="bioInput" rows="3" class="w-full p-2.5 text-sm resize-none" placeholder="A brief professional summary..."></textarea>
+                </div>
             </div>
-            
-            <div class="flex items-center gap-3 relative">
-                <button onclick="window.toggleDarkMode()" class="text-[var(--text2)] hover:text-orange-500 transition px-2"><i id="darkModeIcon" class="fas fa-moon"></i></button>
-                <div id="userProfileSection"></div>
-                <div id="profileMenu" style="display:none;position:absolute;top:45px;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:160px;z-index:50;">
-                    <button onclick="window.openProfileModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-user-edit text-orange-500 w-4"></i> Edit Profile</button>
-                    <button onclick="window.openCreatePageModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-flag text-teal-500 w-4"></i> Create Page</button>
-                    <hr class="my-1 border-[var(--border)]">
-                    <button id="logoutBtn" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm text-red-500 hover:bg-red-50"><i class="fas fa-sign-out-alt w-4"></i> Logout</button>
+            <div class="modal-footer">
+                <button id="saveProfileBtn" class="btn-primary w-full py-3">Save and Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Password Modal -->
+    <div class="modal-overlay" id="adminPasswordModal">
+        <div class="modal-content" style="max-width:380px;">
+            <div class="modal-header">
+                <h2 class="font-bold text-lg"><i class="fas fa-shield-alt mr-2" style="color:var(--accent);"></i>Admin Access</h2>
+                <button onclick="document.getElementById('adminPasswordModal').classList.remove('open')" class="btn-ghost" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body space-y-4">
+                <p class="text-sm" style="color:var(--muted);">Enter admin password to continue.</p>
+                <div>
+                    <input type="password" id="adminPasswordInput" class="w-full p-2.5 text-sm" placeholder="Enter password" onkeydown="if(event.key==='Enter') window.verifyAdmin()">
+                </div>
+                <p id="adminPasswordError" class="text-xs font-semibold hidden" style="color:var(--danger);">Incorrect password. Try again.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="document.getElementById('adminPasswordModal').classList.remove('open')" class="btn-ghost">Cancel</button>
+                <button onclick="window.verifyAdmin()" class="btn-primary">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal (Full Screen Original) -->
+    <div class="modal-overlay" id="adminPanelModal">
+        <div class="modal-content" style="max-width:960px; max-height:90vh; border-radius:16px;">
+            <div class="modal-header" style="background:var(--gradient-hero); border-bottom:none;">
+                <h2 class="font-bold text-lg" style="color:white;"><i class="fas fa-cog mr-2"></i>Admin Dashboard</h2>
+                <button onclick="window.closeAdminPanel()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="display:flex; min-height:500px;">
+                <!-- Admin Sidebar -->
+                <div style="width:220px; border-right:1px solid var(--border); padding:16px 12px; flex-shrink:0;" id="adminSidebar">
+                    <button class="admin-sidebar-link active" onclick="window.showAdminTab('overview')"><i class="fas fa-chart-pie"></i> Overview</button>
+                    <button class="admin-sidebar-link" onclick="window.showAdminTab('users')"><i class="fas fa-users"></i> Users</button>
+                    <button class="admin-sidebar-link" onclick="window.showAdminTab('posts')"><i class="fas fa-file-alt"></i> Posts</button>
+                    <button class="admin-sidebar-link" onclick="window.showAdminTab('settings')"><i class="fas fa-sliders-h"></i> Site Settings</button>
+                    <button class="admin-sidebar-link" onclick="window.showAdminTab('appearance')"><i class="fas fa-palette"></i> Appearance</button>
+                    <div style="height:1px; background:var(--border); margin:12px 0;"></div>
+                    <button class="admin-sidebar-link" onclick="window.showAdminTab('danger')" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</button>
+                </div>
+                <!-- Admin Content -->
+                <div style="flex:1; padding:24px; overflow-y:auto; max-height:calc(90vh - 60px);" id="adminContent">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <div class="flex items-center gap-5">
+                <div class="logo" id="logoBtn" onclick="window.handleLogoClick()">
+                    FriendsFlow<span class="logo-dot"></span>
+                </div>
+                <div class="hidden md:block search-box">
+                    <i class="fas fa-search text-sm" style="color:var(--muted); margin-right:8px;"></i>
+                    <input type="text" placeholder="Search people, posts, topics..." style="border:none !important; background:transparent !important; box-shadow:none !important;">
+                </div>
+            </div>
+            <div class="flex items-center gap-1 sm:gap-2">
+                <button class="nav-icon-btn active" title="Home"><i class="fas fa-home text-lg"></i><span class="nav-label hidden sm:block">Home</span></button>
+                <button id="chatPublicBtn" class="nav-icon-btn" title="Chat"><i class="fas fa-comments text-lg"></i><span class="nav-label hidden sm:block">Chat</span></button>
+                <button onclick="window.openOnlineUsersModal()" class="nav-icon-btn" title="Network"><i class="fas fa-user-friends text-lg"></i><span class="nav-label hidden sm:block">Network</span><span class="badge navbarOnlineCount">0</span></button>
+                <button class="nav-icon-btn" title="Notifications"><i class="fas fa-bell text-lg"></i><span class="nav-label hidden sm:block">Alerts</span></button>
+                <div class="w-px h-7 mx-1 hidden sm:block" style="background:var(--border);"></div>
+                <div id="userProfileSection" class="relative" onclick="window.toggleMenu()"></div>
+                <div id="profileMenu" class="dropdown-menu">
+                    <button onclick="window.openProfileModal()" class="dropdown-item"><i class="fas fa-user-circle"></i> View Profile</button>
+                    <button onclick="window.openProfileModal()" class="dropdown-item"><i class="fas fa-cog"></i> Settings</button>
+                    <div style="height:1px; background:var(--border); margin:4px 0;"></div>
+                    <button id="logoutBtn" class="dropdown-item danger"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN HOME VIEW -->
-    <main id="homeView" class="max-w-3xl mx-auto px-4 py-6 transition-all duration-300">
-        <div id="activePageHeader" class="hidden mb-6 card overflow-hidden relative">
-            <button onclick="window.closePageView()" class="absolute top-4 left-4 z-20 text-[var(--text)] p-2 w-8 h-8 rounded-full shadow-md flex items-center justify-center" style="background:var(--card);"><i class="fas fa-arrow-left text-sm"></i></button>
-            <div id="viewPageCover" class="h-32 w-full bg-cover bg-center relative"><div class="absolute inset-0 bg-black/40"></div></div>
-            <div class="px-5 pb-4 relative -mt-10 flex flex-col items-center sm:items-start sm:flex-row gap-4">
-                <img id="viewPageLogo" class="w-20 h-20 rounded-full border-4 object-cover shadow-md relative z-10" style="border-color:var(--card);">
-                <div class="mt-2 sm:mt-10 text-center sm:text-left flex-1">
-                    <h1 id="viewPageName" class="font-display font-bold text-xl"></h1>
-                    <p id="viewPageCategory" class="text-xs font-medium text-orange-500 mb-1"></p>
+    <!-- Main Home View -->
+    <main id="homeView" style="max-width:1120px; margin:0 auto; padding:1.5rem 1rem;">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
+            <!-- Left Sidebar -->
+            <div id="homeLeftSidebar" class="w-full md:w-60 shrink-0 hidden md:block">
+                <div class="card profile-sidebar-card sticky" style="top:80px;">
+                    <div class="cover"></div>
+                    <div class="px-5 pb-4 flex flex-col items-center text-center" style="margin-top:-4px;">
+                        <div class="avatar-wrap"><img id="sidebarUserAvatar" src="https://ui-avatars.com/api/?name=User&background=1B6B5A&color=fff&size=128"></div>
+                        <h4 id="sidebarUserName" class="font-bold text-sm mt-3 cursor-pointer">Welcome, User</h4>
+                        <p id="sidebarUserHandle" class="text-xs mt-1 line-clamp-2" style="color:var(--muted);">Connect with professionals</p>
+                    </div>
+                    <div style="border-top:1px solid var(--border); padding:12px 20px;">
+                        <div class="flex justify-between items-center text-xs font-semibold cursor-pointer" style="color:var(--muted);"><span>Connections</span><span class="font-bold navbarOnlineCount" style="color:var(--accent);">0</span></div>
+                    </div>
+                    <div style="border-top:1px solid var(--border); padding:12px 20px;">
+                        <div class="flex justify-between items-center text-xs font-semibold cursor-pointer" style="color:var(--muted);"><span>Profile views</span><span class="font-bold" style="color:var(--accent);">12</span></div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <div id="myPagesSection" class="hidden mb-6">
-            <h3 class="font-display font-bold text-sm mb-3 uppercase tracking-wide text-[var(--text2)]">My Pages</h3>
-            <div id="pagesContainer" class="flex gap-3 overflow-x-auto pb-2"></div>
-        </div>
-
-        <div class="card p-4 mb-6" id="postCreatorCard">
-            <div class="flex items-start gap-3">
-                <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Guest" class="avatar" alt="Author">
-                <div style="flex:1;">
-                    <div contenteditable="true" id="postText" class="outline-none min-h-[40px] py-1 text-sm text-[var(--text)]" data-placeholder="What's on your mind?"></div>
-                    <div class="link-bar flex items-center gap-2 p-2 mt-2">
-                        <i class="fas fa-link text-orange-500 text-xs ml-1"></i>
-                        <input type="text" id="linkInput" placeholder="Paste link here..." oninput="window.handleLinkInput(this.value)">
-                        <button id="clearLinkBtn" class="hidden text-[var(--muted)]" onclick="window.clearLink()"><i class="fas fa-times text-xs"></i></button>
-                    </div>
-                    <div id="linkPreviewArea" style="display:none;margin-top:10px;"></div>
-                    <div id="imagePreviewArea" style="display:none; margin-top:10px; position:relative;">
-                        <img id="uploadedImage" src="" style="width:100%; max-height:250px; object-contain border-radius:12px; border:1px solid var(--border);">
-                        <button onclick="window.clearImage()" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; w:24px; h:24px;"><i class="fas fa-times text-xs"></i></button>
-                    </div>
-                    <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
-                    <div class="flex items-center justify-between mt-3 pt-2 border-t" style="border-color:var(--border);">
-                        <button onclick="document.getElementById('imageInput').click()" class="text-teal-500 hover:text-teal-600 px-2"><i class="fas fa-image"></i></button>
-                        <button class="btn-post text-sm" id="postBtn" onclick="window.createPost()" disabled>Post</button>
+                <div class="card mt-4 p-4 sticky" style="top:340px;">
+                    <div class="space-y-1">
+                        <a href="#" class="flex items-center gap-3 text-xs font-semibold py-2 px-2 rounded-lg transition" style="color:var(--muted); text-decoration:none;" onmouseover="this.style.background='var(--accent-light)';this.style.color='var(--accent)'" onmouseout="this.style.background='transparent';this.style.color='var(--muted)'"><i class="fas fa-bookmark w-4"></i> Saved Posts</a>
+                        <a href="#" class="flex items-center gap-3 text-xs font-semibold py-2 px-2 rounded-lg transition" style="color:var(--muted); text-decoration:none;" onmouseover="this.style.background='var(--accent-light)';this.style.color='var(--accent)'" onmouseout="this.style.background='transparent';this.style.color='var(--muted)'"><i class="fas fa-users w-4"></i> Groups</a>
+                        <a href="#" class="flex items-center gap-3 text-xs font-semibold py-2 px-2 rounded-lg transition" style="color:var(--muted); text-decoration:none;" onmouseover="this.style.background='var(--accent-light)';this.style.color='var(--accent)'" onmouseout="this.style.background='transparent';this.style.color='var(--muted)'"><i class="fas fa-calendar-alt w-4"></i> Events</a>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <h3 id="feedTitle" class="font-display font-bold text-sm mb-3 uppercase tracking-wide text-[var(--text2)]">Global Feed</h3>
-        <div id="feedContainer"><div class="text-center text-[var(--muted)] py-10 text-sm">Loading posts...</div></div>
+            <!-- Main Feed -->
+            <div id="homeMainContent" class="flex-1 w-full min-w-0">
+                <!-- Post Creator -->
+                <div class="card p-5 mb-5" id="postCreatorCard">
+                    <div class="flex items-start gap-3">
+                        <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=G&background=1B6B5A&color=fff&size=96" style="width:44px; height:44px; border-radius:50%; border:2px solid var(--border); object-fit:cover;">
+                        <div class="flex-1">
+                            <button onclick="document.getElementById('postText').focus()" class="w-full text-left rounded-full px-4 py-3 text-sm font-medium transition" style="border:1.5px solid var(--border); color:var(--muted); background:transparent;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
+                                Share an update, article, or idea...
+                            </button>
+                            <div class="mt-3">
+                                <textarea id="postText" rows="2" class="w-full p-3 text-sm resize-none" placeholder="What's on your mind? Share insights, ask questions..." style="border:none !important; background:transparent !important; box-shadow:none !important;"></textarea>
+
+                                <!-- Link Input -->
+                                <div id="linkInputArea" style="display:none;" class="link-input-area">
+                                    <i class="fas fa-link text-sm" style="color:var(--accent);"></i>
+                                    <input type="url" id="postLinkInput" placeholder="https://example.com" style="font-size:0.85rem; padding:8px 12px;">
+                                    <button onclick="window.removeLinkInput()" class="btn-ghost" style="padding:6px 8px;"><i class="fas fa-times"></i></button>
+                                </div>
+                                <div id="linkTagArea" style="display:none;">
+                                    <span class="link-tag"><i class="fas fa-link" style="font-size:0.65rem;"></i> <span id="linkTagText"></span> <button onclick="window.removeLink()"><i class="fas fa-times-circle"></i></button></span>
+                                </div>
+
+                                <div id="imagePreviewArea" style="display:none; margin-top:10px; position:relative; border-radius:12px; overflow:hidden;">
+                                    <img id="uploadedImage" src="" style="width:100%; max-height:280px; object-fit:cover;">
+                                    <button onclick="window.clearImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times text-xs"></i></button>
+                                </div>
+                                <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="window.handleImageUpload(event)">
+
+                                <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid var(--border);">
+                                    <div class="flex gap-1">
+                                        <button onclick="document.getElementById('imageInput').click()" class="btn-ghost flex items-center gap-2"><i class="fas fa-image" style="color:#0A66C2;"></i> Media</button>
+                                        <button onclick="window.showLinkInput()" class="btn-ghost flex items-center gap-2"><i class="fas fa-link" style="color:var(--accent);"></i> Link</button>
+                                        <button class="btn-ghost flex items-center gap-2"><i class="fas fa-file-alt" style="color:#F39C12;"></i> Article</button>
+                                    </div>
+                                    <button class="btn-primary text-sm" id="postBtn" onclick="window.createPost()" disabled>Publish</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 mb-4 px-1">
+                    <hr class="flex-1" style="border-color:var(--border);">
+                    <span class="text-xs font-semibold" style="color:var(--muted);">Sorted by <strong style="color:var(--text);">Recent</strong></span>
+                    <hr class="flex-1" style="border-color:var(--border);">
+                </div>
+
+                <div id="feedContainer" class="space-y-4 separate-posts-scroll">
+                    <div class="text-center py-16" style="color:var(--muted);"><i class="fas fa-stream text-4xl mb-4" style="opacity:0.3;"></i><p class="text-sm font-medium">Loading your network feed...</p></div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div id="homeRightSidebar" class="hidden lg:block w-72 shrink-0">
+                <div class="card p-5 sticky" style="top:80px;">
+                    <h3 class="font-bold text-sm mb-4">Trending in Your Network</h3>
+                    <ul class="space-y-1">
+                        <li class="news-item"><h4 class="text-sm font-semibold transition" style="color:var(--text2);">The Future of AI in Hiring</h4><p class="text-xs mt-1" style="color:var(--muted);">Industry &middot; 10,432 readers</p></li>
+                        <li class="news-item"><h4 class="text-sm font-semibold transition" style="color:var(--text2);">Remote Work Culture 2026</h4><p class="text-xs mt-1" style="color:var(--muted);">Tech &middot; 5,900 readers</p></li>
+                        <li class="news-item"><h4 class="text-sm font-semibold transition" style="color:var(--text2);">Building High-Performance Teams</h4><p class="text-xs mt-1" style="color:var(--muted);">Leadership &middot; 3,210 readers</p></li>
+                        <li class="news-item"><h4 class="text-sm font-semibold transition" style="color:var(--text2);">Full-Stack Developer Roadmap</h4><p class="text-xs mt-1" style="color:var(--muted);">Engineering &middot; 8,102 readers</p></li>
+                    </ul>
+                    <button class="btn-ghost w-full mt-3 text-xs">Show more</button>
+                </div>
+                <div class="card p-5 mt-4 sticky" style="top:420px;">
+                    <h3 class="font-bold text-sm mb-4">People You May Know</h3>
+                    <div class="space-y-4" id="suggestedPeople"></div>
+                    <button class="btn-ghost w-full mt-3 text-xs">Show more</button>
+                </div>
+                <div class="mt-6 px-2">
+                    <p class="text-xs" style="color:var(--muted); line-height:1.8;">About &middot; Accessibility &middot; Help Center &middot; Privacy &middot; Terms</p>
+                    <p class="text-xs mt-2" style="color:var(--muted);">FriendsFlow Corporation &copy; 2025</p>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <!-- FULL SCREEN CHAT ROOM -->
-    <div id="fullScreenChat" class="fixed inset-0 z-[200] flex flex-col">
-        <div class="border-b px-4 py-2 flex items-center justify-between shadow-sm z-10" style="background:var(--card); border-color:var(--border);">
-            <div class="flex items-center gap-3">
-                <button onclick="window.closeChatRoom()" class="w-8 h-8 rounded-full flex items-center justify-center transition" style="background:var(--bg2); color:var(--text);">
-                    <i class="fas fa-arrow-left text-sm"></i>
-                </button>
-                <div>
-                    <h2 class="font-display font-bold text-md leading-tight text-[var(--text)]">Public Chat Room</h2>
-                    <p class="text-[0.65rem] text-red-500 font-medium">Auto-deletes in 20 mins.</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <button onclick="window.shareChatLink()" class="text-teal-500 text-xs font-semibold px-2 py-1 rounded border border-teal-500 hover:bg-teal-50"><i class="fas fa-share-alt"></i> Share</button>
-                <button onclick="document.getElementById('activeUsersSidebar').classList.toggle('hidden')" class="md:hidden p-1.5 rounded-lg" style="background:var(--bg2);"><i class="fas fa-users text-sm"></i></button>
-            </div>
-        </div>
-
-        <div class="flex flex-1 overflow-hidden">
-            <div id="activeUsersSidebar" class="w-full md:w-64 border-r flex flex-col hidden md:flex absolute md:relative inset-0 z-20 md:z-0" style="background:var(--card); border-color:var(--border);">
-                <div class="p-3 border-b flex items-center justify-between" style="background:var(--bg2); border-color:var(--border);">
-                    <h3 class="font-bold text-xs text-[var(--text)]">Online (<span id="onlineCount">0</span>/30)</h3>
-                    <button onclick="document.getElementById('activeUsersSidebar').classList.add('hidden')" class="md:hidden text-[var(--muted)]"><i class="fas fa-times"></i></button>
-                </div>
-                <div id="onlineUsersList" class="flex-1 overflow-y-auto chat-scroll p-2 space-y-1"></div>
-            </div>
-
-            <div class="flex-1 flex flex-col relative" style="background: var(--chat-bg);">
-                <div id="chatMessagesArea" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3 flex flex-col pr-4 sm:pr-6">
-                    <!-- Chat Bubbles rendered here -->
-                </div>
-
-                <div class="border-t p-3 relative" style="background:var(--card); border-color:var(--border);">
-                    <div id="emojiPicker" class="emoji-picker">
-                        <span class="emoji-item" onclick="window.addEmoji('😀')">😀</span><span class="emoji-item" onclick="window.addEmoji('😂')">😂</span><span class="emoji-item" onclick="window.addEmoji('😍')">😍</span><span class="emoji-item" onclick="window.addEmoji('😎')">😎</span><span class="emoji-item" onclick="window.addEmoji('🤔')">🤔</span><span class="emoji-item" onclick="window.addEmoji('🔥')">🔥</span><span class="emoji-item" onclick="window.addEmoji('👍')">👍</span><span class="emoji-item" onclick="window.addEmoji('❤️')">❤️</span><span class="emoji-item" onclick="window.addEmoji('🎉')">🎉</span><span class="emoji-item" onclick="window.addEmoji('👏')">👏</span>
-                    </div>
-
-                    <div class="flex items-center gap-2 rounded-full px-3 py-1.5 border transition-all" style="background:var(--bg2); border-color:var(--border);">
-                        <button onclick="document.getElementById('emojiPicker').classList.toggle('active')" class="text-[var(--text2)] hover:text-orange-500"><i class="far fa-smile text-lg"></i></button>
-                        <button class="text-[var(--text2)] hover:text-teal-500" onclick="document.getElementById('chatImageInput').click()"><i class="fas fa-image text-lg"></i></button>
-                        <input type="file" id="chatImageInput" accept="image/*" class="hidden" onchange="window.handleChatImage(event)">
-                        
-                        <input type="text" id="chatInputField" class="flex-1 bg-transparent border-none outline-none text-sm px-1 text-[var(--text)]" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()">
-                        <button onclick="window.sendChatMessage()" class="w-7 h-7 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white flex items-center justify-center"><i class="fas fa-paper-plane text-[0.6rem]"></i></button>
-                    </div>
-                    <div id="chatImagePreviewBox" class="hidden mt-2 relative inline-block">
-                        <img id="chatImgPreview" src="" class="h-12 rounded-lg border border-[var(--border)]">
-                        <button onclick="window.clearChatImage()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[0.6rem]"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-            </div>
+    <!-- Online Users Modal -->
+    <div class="modal-overlay" id="onlineUsersModal">
+        <div class="modal-content" style="max-height:80vh; max-width:420px;">
+            <div class="modal-header"><h2 class="font-bold text-lg">My Network</h2><button onclick="document.getElementById('onlineUsersModal').classList.remove('open')" class="btn-ghost" style="padding:4px 8px;"><i class="fas fa-times"></i></button></div>
+            <div style="padding:8px 16px; border-bottom:1px solid var(--border);"><div class="search-box" style="width:100%;"><i class="fas fa-search text-xs" style="color:var(--muted); margin-right:8px;"></i><input type="text" placeholder="Search connections..." style="border:none !important; background:transparent !important; box-shadow:none !important; width:100%; padding:8px 0;"></div></div>
+            <div id="modalUsersList" class="modal-body space-y-1" style="padding:12px 16px;"></div>
         </div>
     </div>
 
-    <!-- Firebase JS SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy, serverTimestamp, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, doc, getDoc, setDoc, deleteDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAt1Ovfnj8MuAf2zddjH9ShdKfQyX9vcMA",
@@ -278,315 +445,623 @@
             messagingSenderId: "489214702390",
             appId: "1:489214702390:web:6a07c74a4863e08c5a3997"
         };
-        const ADMIN_EMAIL = "admin@linkvibe.com"; 
 
         let app, auth, db;
-        try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } catch(e) {}
+        try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } catch(e) { console.error("Firebase init failed", e); }
 
-        let currentUser = null; 
-        let myPagesArray = []; 
+        let currentUser = null;
         let allPostsArray = [];
-        let currentContext = { type: 'home', id: null, data: null }; 
+        let adminUnlocked = false;
 
-        // UI & Dark Mode
-        window.toggleDarkMode = function() {
-            document.body.classList.toggle('dark-mode');
-            const icon = document.getElementById('darkModeIcon');
-            if(document.body.classList.contains('dark-mode')) { icon.classList.replace('fa-moon', 'fa-sun'); localStorage.setItem('theme', 'dark'); } 
-            else { icon.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); }
-        };
-        if(localStorage.getItem('theme') === 'dark') window.toggleDarkMode();
-
-        window.addEmoji = function(emoji) { const input = document.getElementById('chatInputField'); input.value += emoji; document.getElementById('emojiPicker').classList.remove('active'); input.focus(); };
-        window.shareChatLink = function() { const chatUrl = window.location.origin + window.location.pathname + "#chat"; if (navigator.share) navigator.share({ title: 'Join LinkVibe Public Chat', url: chatUrl }).catch(()=>{}); else { navigator.clipboard.writeText(chatUrl); window.showToast("Chat link copied!", "success"); } };
-
-        // ==========================================
-        // SMART CHAT & TALKING BOTS
-        // ==========================================
-        let chatUnsubscribe = null; let onlineUnsubscribe = null; let pendingChatImage = null;
-        let realChatMessages = []; let botChatMessages = [];
-
-        const dummyBots = [
-            { name: "Sara (Bot)", photo: "https://ui-avatars.com/api/?name=S&background=random" }, { name: "Ahmed", photo: "https://ui-avatars.com/api/?name=A&background=random" },
-            { name: "TechGuru", photo: "https://ui-avatars.com/api/?name=T&background=random" }, { name: "Zainab", photo: "https://ui-avatars.com/api/?name=Z&background=random" },
-            { name: "CodeNinja", photo: "https://ui-avatars.com/api/?name=C&background=random" }, { name: "Usman", photo: "https://ui-avatars.com/api/?name=U&background=random" },
-            { name: "Fatima", photo: "https://ui-avatars.com/api/?name=F&background=random" }, { name: "AI Lover", photo: "https://ui-avatars.com/api/?name=A&background=random" },
-            { name: "Bilal", photo: "https://ui-avatars.com/api/?name=B&background=random" }, { name: "Ayesha", photo: "https://ui-avatars.com/api/?name=A&background=random" }
+        /* ====== DUMMY DATA FOR UI ====== */
+        const dummyUsers = [
+            { name: 'Priya Sharma', role: 'Product Manager at Flipkart', color: 'E74C3C' },
+            { name: 'Rohan Mehta', role: 'Senior Engineer at Google', color: '3498DB' },
+            { name: 'Ananya Gupta', role: 'Data Scientist, PhD', color: '9B59B6' },
+            { name: 'Vikram Singh', role: 'Design Lead at Razorpay', color: 'F39C12' },
+            { name: 'Neha Reddy', role: 'CTO at StartupX', color: '1ABC9C' },
+            { name: 'Arjun Patel', role: 'Full-Stack Developer', color: '2ECC71' }
         ];
 
-        document.getElementById('chatPublicBtn').addEventListener('click', () => {
-            if(!currentUser) { showToast("Login required for chat!", "error"); return window.openLoginModal(); }
-            if(!currentUser.handle) { document.getElementById('profileSetupModal').classList.add('open'); return showToast("Create profile first!", "info"); }
-            window.openChatRoom();
-        });
+        /* ====== ADMIN SYSTEM (WITH lahore799 PASSWORD) ====== */
+        let logoClickCount = 0;
+        let logoClickTimer = null;
 
-        window.openChatRoom = async function() {
-            document.getElementById('fullScreenChat').classList.add('open');
-            document.body.style.overflow = 'hidden'; window.location.hash = "chat";
+        window.handleLogoClick = function() {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 3000);
 
-            await setDoc(doc(db, "chat_presence", currentUser.uid), { uid: currentUser.uid, name: currentUser.name || currentUser.handle, photo: currentUser.photo || currentUser.photoURL, lastSeen: serverTimestamp() });
-
-            onlineUnsubscribe = onSnapshot(collection(db, "chat_presence"), (snapshot) => {
-                const list = document.getElementById('onlineUsersList'); list.innerHTML = '';
-                snapshot.forEach(docSnap => {
-                    const user = docSnap.data();
-                    list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${user.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${user.name}</span></div>`;
-                });
-                dummyBots.forEach(bot => {
-                    list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${bot.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${bot.name}</span></div>`;
-                });
-                document.getElementById('onlineCount').textContent = snapshot.size + 10;
-            });
-
-            // Fetch Real Messages
-            const q = query(collection(db, "public_chat"), orderBy("createdAt", "asc"));
-            chatUnsubscribe = onSnapshot(q, (snapshot) => {
-                realChatMessages = [];
-                const now = Date.now(); const twentyMins = 20 * 60 * 1000;
-                snapshot.forEach(docSnap => {
-                    const msg = docSnap.data();
-                    if(msg.createdAt) { const msgTime = msg.createdAt.toMillis(); if((now - msgTime) > twentyMins && !msg.isReported) return; realChatMessages.push({ id: docSnap.id, time: msgTime, ...msg }); }
-                });
-                window.renderChatArea();
-            });
-
-            // Bot Auto-Chat Interval (Every ~35 seconds)
-            if(!window.botInterval) {
-                window.botInterval = setInterval(() => {
-                    if(!document.getElementById('fullScreenChat').classList.contains('open')) return;
-                    const randomBot = dummyBots[Math.floor(Math.random() * dummyBots.length)];
-                    const msgs = ["Hello everyone! 👋", "LinkVibe ki speed achi hai.", "Koi online hai chat ke liye?", "Tech updates are great today 🔥", "Hi guys!", "Dark mode is looking cool 🌙", "Anyone from Lahore here?"];
-                    botChatMessages.push({ id: 'bot-' + Date.now(), uid: 'bot', author: randomBot.name + ' ✔️', authorPic: randomBot.photo, text: msgs[Math.floor(Math.random() * msgs.length)], time: Date.now(), isBot: true });
-                    if(botChatMessages.length > 20) botChatMessages.shift(); // keep memory clean
-                    window.renderChatArea();
-                }, 35000);
-            }
-        };
-
-        window.renderChatArea = function() {
-            const area = document.getElementById('chatMessagesArea');
-            const allMsgs = [...realChatMessages, ...botChatMessages].sort((a, b) => a.time - b.time);
-            
-            let messagesHTML = '<div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>';
-
-            allMsgs.forEach(msg => {
-                const isMe = msg.uid === currentUser?.uid;
-                const isAdmin = currentUser?.email === ADMIN_EMAIL;
-                let toolsHtml = '';
-                
-                if(!msg.isBot) {
-                    toolsHtml += `<button onclick="window.reportMsg('${msg.id}')" title="Report" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-exclamation-triangle"></i></button>`;
-                    if(isAdmin || isMe) { toolsHtml += `<button onclick="window.deleteMsg('${msg.id}')" title="Delete" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-trash"></i></button>`; }
-                }
-
-                let mediaHtml = msg.image ? `<img src="${msg.image}" class="mt-2 rounded-xl max-h-32 object-contain">` : '';
-
-                if(isMe) {
-                    messagesHTML += `<div class="flex justify-end mb-3 w-full"><div class="flex items-end flex-col max-w-[85%]"><div class="flex items-center mb-1">${toolsHtml}</div><div class="chat-bubble me shadow-sm"><p class="whitespace-pre-wrap">${msg.text}</p>${mediaHtml}</div></div></div>`;
+            if (logoClickCount >= 5) {
+                logoClickCount = 0;
+                if (adminUnlocked) {
+                    window.openAdminPanel();
                 } else {
-                    messagesHTML += `<div class="flex justify-start mb-3 w-full"><img src="${msg.authorPic}" class="w-6 h-6 rounded-full border mr-2 self-end mb-1" style="border-color:var(--border);"><div class="flex items-start flex-col max-w-[85%]"><span class="text-[0.6rem] text-[var(--muted)] mb-0.5 ml-1">${msg.author}</span><div class="chat-bubble other shadow-sm"><p class="whitespace-pre-wrap">${msg.text}</p>${mediaHtml}</div><div class="flex items-center mt-1">${toolsHtml}</div></div></div>`;
+                    document.getElementById('adminPasswordModal').classList.add('open');
+                    document.getElementById('adminPasswordInput').value = '';
+                    document.getElementById('adminPasswordError').classList.add('hidden');
+                    setTimeout(() => document.getElementById('adminPasswordInput').focus(), 300);
                 }
-            });
-            area.innerHTML = messagesHTML; area.scrollTop = area.scrollHeight;
-        }
-
-        window.closeChatRoom = async function() {
-            document.getElementById('fullScreenChat').classList.remove('open'); document.body.style.overflow = 'auto'; window.location.hash = ""; 
-            if(chatUnsubscribe) chatUnsubscribe(); if(onlineUnsubscribe) onlineUnsubscribe();
-            if(window.botInterval) { clearInterval(window.botInterval); window.botInterval = null; }
-            if(currentUser && db) { await deleteDoc(doc(db, "chat_presence", currentUser.uid)); }
+            }
         };
 
-        // ADVANCED FILTER: Catches numbers even with spaces/newlines
-        function applyWordFilter(text) {
-            let filtered = text.replace(/(?:\d[\s\n\r]*){7,}/g, "[Number Blocked]");
-            const badWords = ["gali", "abuse", "politics", "stupid", "idiot"];
-            badWords.forEach(word => { const regex = new RegExp(`\\b${word}\\b`, 'gi'); filtered = filtered.replace(regex, "***"); });
-            return filtered;
-        }
-
-        window.handleChatImage = function(e) { const file = e.target.files[0]; if(!file) return; resizeImage(file, 600, 600, (resized) => { pendingChatImage = resized; document.getElementById('chatImgPreview').src = resized; document.getElementById('chatImagePreviewBox').classList.remove('hidden'); }); };
-        window.clearChatImage = function() { pendingChatImage = null; document.getElementById('chatImageInput').value = ''; document.getElementById('chatImagePreviewBox').classList.add('hidden'); };
-
-        window.sendChatMessage = async function() {
-            const input = document.getElementById('chatInputField'); let rawText = input.value.trim(); document.getElementById('emojiPicker').classList.remove('active');
-            if(!rawText && !pendingChatImage) return;
-
-            const cleanText = applyWordFilter(rawText);
-            input.value = ''; const imgToUpload = pendingChatImage; window.clearChatImage();
-            try { await addDoc(collection(db, "public_chat"), { uid: currentUser.uid, author: currentUser.name || currentUser.handle, authorPic: currentUser.photo || currentUser.photoURL, text: cleanText, image: imgToUpload, isReported: false, createdAt: serverTimestamp() }); } catch(e) { showToast("Message fail", "error"); }
-        };
-
-        window.reportMsg = async function(msgId) { if(confirm("Report this message?")) { await updateDoc(doc(db, "public_chat", msgId), { isReported: true }); showToast("Reported.", "success"); } };
-        window.deleteMsg = async function(msgId) { if(confirm("Delete message?")) { await deleteDoc(doc(db, "public_chat", msgId)); } };
-
-
-        // ==========================================
-        // FEED & PAGES LOGIC
-        // ==========================================
-        window.openPageView = function(pageId) {
-            const pageData = myPagesArray.find(p => p.id === pageId); if(!pageData) return;
-            currentContext = { type: 'page', id: pageId, data: pageData };
-            document.getElementById('myPagesSection').classList.add('hidden'); document.getElementById('activePageHeader').classList.remove('hidden');
-            document.getElementById('viewPageCover').style.backgroundImage = `url('${pageData.cover || ''}')`;
-            document.getElementById('viewPageLogo').src = pageData.logo; document.getElementById('viewPageName').textContent = pageData.name; document.getElementById('viewPageCategory').textContent = pageData.category;
-            document.getElementById('creatorAvatar').src = pageData.logo; document.getElementById('postText').setAttribute('data-placeholder', `Post as ${pageData.name}...`); document.getElementById('feedTitle').textContent = `${pageData.name}'s Posts`;
-            window.renderFeed(); window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.closePageView = function() {
-            currentContext = { type: 'home', id: null, data: null };
-            if(myPagesArray.length > 0) document.getElementById('myPagesSection').classList.remove('hidden');
-            document.getElementById('activePageHeader').classList.add('hidden');
-            if(currentUser) document.getElementById('creatorAvatar').src = currentUser.photo || currentUser.photoURL;
-            document.getElementById('postText').setAttribute('data-placeholder', "What's on your mind?"); document.getElementById('feedTitle').textContent = "Global Feed";
-            window.renderFeed(); 
-        };
-
-        window.openCreatePageModal = () => { document.getElementById('profileMenu').style.display = 'none'; if(!currentUser) { showToast("Pehle login karein!", "error"); return window.openLoginModal(); } document.getElementById('createPageModal').classList.add('open'); };
-        window.handlePageLogo = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 400, 400, (resizedData) => { pageLogoData = resizedData; document.getElementById('pageLogoPreview').src = resizedData; }); };
-        window.handlePageCover = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 800, 400, (resizedData) => { pageCoverData = resizedData; const coverImg = document.getElementById('pageCoverPreview'); coverImg.src = resizedData; coverImg.classList.remove('hidden'); }); };
-
-        window.saveNewPage = async function() {
-            const name = document.getElementById('pageNameInput').value.trim(); const category = document.getElementById('pageCategoryInput').value;
-            if(!name) return showToast("Page name required!", "error");
-            try {
-                await addDoc(collection(db, "pages"), { name: name, category: category, logo: pageLogoData || "https://ui-avatars.com/api/?name=" + name, cover: pageCoverData || null, adminUid: currentUser.uid, createdAt: serverTimestamp() });
-                document.getElementById('createPageModal').classList.remove('open'); document.getElementById('pageNameInput').value = ''; pageLogoData = null; pageCoverData = null; document.getElementById('pageCoverPreview').classList.add('hidden'); showToast("Page created!", "success");
-            } catch(e) { showToast("Error", "error"); }
-        }
-
-        function loadMyPages() {
-            if(!db || !currentUser) return;
-            const q = query(collection(db, "pages"), where("adminUid", "==", currentUser.uid));
-            onSnapshot(q, (snapshot) => {
-                const section = document.getElementById('myPagesSection'); const container = document.getElementById('pagesContainer');
-                container.innerHTML = ''; myPagesArray = [];
-                if(snapshot.empty) { if(currentContext.type === 'home') section.classList.add('hidden'); return; }
-                snapshot.forEach((doc) => {
-                    const page = { id: doc.id, ...doc.data() }; myPagesArray.push(page);
-                    container.innerHTML += `<div onclick="window.openPageView('${page.id}')" class="card p-3 w-36 flex flex-col items-center text-center cursor-pointer hover:shadow-lg relative overflow-hidden group">${page.cover ? `<div class="absolute top-0 left-0 w-full h-10 bg-cover bg-center" style="background-image: url('${page.cover}')"></div>` : `<div class="absolute top-0 left-0 w-full h-10 bg-gradient-to-r from-orange-200 to-orange-100"></div>`}<img src="${page.logo}" class="w-12 h-12 rounded-full object-cover mt-3 mb-1 border-2 border-white relative z-10 shadow-sm"><h4 class="font-bold text-xs text-[var(--text)] truncate w-full relative z-10">${page.name}</h4><p class="text-[0.6rem] text-[var(--muted)] relative z-10">${page.category}</p></div>`;
-                });
-                if(currentContext.type === 'home') section.classList.remove('hidden');
-            });
-        }
-
-        const provider = new GoogleAuthProvider();
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => { if(!auth) return; try { const result = await signInWithPopup(auth, provider); window.closeLoginModal(); await checkAndCreateProfile(result.user); } catch (e) { showToast("Login Failed", "error"); } });
-        document.getElementById('logoutBtn').addEventListener('click', () => { if(auth) signOut(auth); document.getElementById('profileMenu').style.display = 'none'; document.getElementById('myPagesSection').classList.add('hidden'); window.closePageView(); showToast("Logged out.", "info"); });
-
-        async function checkAndCreateProfile(firebaseUser) {
-            if(!db) return; const userRef = doc(db, "users", firebaseUser.uid); const docSnap = await getDoc(userRef);
-            if (!docSnap.exists()) { document.getElementById('profileSetupModal').classList.add('open'); } else { currentUser = { ...firebaseUser, ...docSnap.data() }; updateNavbarUI(currentUser); loadMyPages(); }
-        }
-
-        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
-            const handle = document.getElementById('usernameInput').value.trim(); const bio = document.getElementById('bioInput').value.trim();
-            if(!handle) return showToast("Username needed!", "error");
-            try {
-                const newUserData = { name: auth.currentUser.displayName, email: auth.currentUser.email, photo: auth.currentUser.photoURL, handle: `@${handle.replace('@', '')}`, bio: bio, createdAt: serverTimestamp() };
-                await setDoc(doc(db, "users", auth.currentUser.uid), newUserData, { merge: true });
-                document.getElementById('profileSetupModal').classList.remove('open'); showToast("Profile saved!", "success");
-                currentUser = { ...auth.currentUser, ...newUserData }; updateNavbarUI(currentUser); loadMyPages();
-            } catch(e) { showToast("Error", "error"); }
-        });
-
-        if(auth) {
-            onAuthStateChanged(auth, async (user) => {
-                if(user) {
-                    const userRef = doc(db, "users", user.uid); const docSnap = await getDoc(userRef);
-                    if(docSnap.exists()){
-                        currentUser = { ...user, ...docSnap.data() }; updateNavbarUI(currentUser);
-                        document.getElementById('usernameInput').value = currentUser.handle.replace('@', ''); document.getElementById('bioInput').value = currentUser.bio || '';
-                        loadMyPages();
-                        if(window.location.hash === '#chat') { setTimeout(() => document.getElementById('chatPublicBtn').click(), 500); }
-                    } else { currentUser = user; document.getElementById('profileSetupModal').classList.add('open'); updateNavbarUI(user); }
-                } else { currentUser = null; updateNavbarUI(null); window.closePageView(); }
-            });
-        }
-
-        function updateNavbarUI(user) {
-            const section = document.getElementById('userProfileSection');
-            if(user) {
-                const photo = user.photo || user.photoURL || "https://ui-avatars.com/api/?name=U";
-                section.innerHTML = `<img src="${photo}" class="avatar cursor-pointer" onclick="window.toggleMenu()">`;
-                if(currentContext.type === 'home') document.getElementById('creatorAvatar').src = photo;
+        window.verifyAdmin = function() {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (pwd === 'lahore799') {
+                adminUnlocked = true;
+                document.getElementById('adminPasswordModal').classList.remove('open');
+                showToast('Admin access granted', 'success');
+                window.openAdminPanel();
             } else {
-                section.innerHTML = `<button onclick="window.openLoginModal()" class="text-xs font-semibold bg-orange-100 text-orange-600 px-3 py-1.5 rounded-lg">Log In</button>`;
-                document.getElementById('creatorAvatar').src = "https://ui-avatars.com/api/?name=G";
-            }
-        }
-
-        function resizeImage(file, maxWidth, maxHeight, callback) {
-            const reader = new FileReader();
-            reader.onload = function(e) { const img = new Image(); img.onload = function() { let width = img.width; let height = img.height; if (width > height) { if (width > maxWidth) { height = Math.round(height *= maxWidth / width); width = maxWidth; } } else { if (height > maxHeight) { width = Math.round(width *= maxHeight / height); height = maxHeight; } } const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', 0.6)); }; img.src = e.target.result; }; reader.readAsDataURL(file);
-        }
-
-        window.handleLinkInput = function(value) {
-            const clearBtn = document.getElementById('clearLinkBtn'); const previewArea = document.getElementById('linkPreviewArea'); clearTimeout(previewTimeout);
-            if (value.trim() === '') { clearBtn.classList.add('hidden'); previewArea.style.display = 'none'; currentLinkPreview = null; isPreviewLoading = false; window.updatePostBtn(); return; }
-            clearBtn.classList.remove('hidden');
-            if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(value.trim())) {
-                isPreviewLoading = true; window.updatePostBtn(); previewArea.style.display = 'block'; previewArea.innerHTML = `<div class="text-xs text-[var(--muted)]">Loading preview...</div>`;
-                previewTimeout = setTimeout(() => {
-                    const domain = value.trim().replace(/^https?:\/\//, '').split('/')[0];
-                    currentLinkPreview = { url: value.trim(), domain: domain, title: "Shared Link", image: `https://picsum.photos/seed/${domain}/600/300.jpg` };
-                    previewArea.innerHTML = `<div class="link-preview" onclick="window.open('${currentLinkPreview.url}', '_blank')"><img src="${currentLinkPreview.image}" class="link-preview-img"><div class="p-2 text-xs"><div class="text-teal-500"><i class="fas fa-globe"></i> ${domain}</div></div></div>`;
-                    isPreviewLoading = false; window.updatePostBtn();
-                }, 800);
+                document.getElementById('adminPasswordError').classList.remove('hidden');
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminPasswordInput').focus();
             }
         };
 
-        window.clearLink = function() { document.getElementById('linkInput').value = ''; document.getElementById('linkPreviewArea').style.display = 'none'; document.getElementById('clearLinkBtn').classList.add('hidden'); currentLinkPreview = null; isPreviewLoading = false; clearTimeout(previewTimeout); window.updatePostBtn(); };
-        window.handleImageUpload = function(event) { const file = event.target.files[0]; if (!file) return; resizeImage(file, 600, 600, (resizedData) => { currentImagePreview = resizedData; document.getElementById('uploadedImage').src = resizedData; document.getElementById('imagePreviewArea').style.display = 'block'; window.clearLink(); window.updatePostBtn(); }); };
-        window.clearImage = function() { document.getElementById('imageInput').value = ''; document.getElementById('imagePreviewArea').style.display = 'none'; currentImagePreview = null; window.updatePostBtn(); };
-        window.updatePostBtn = function() { const text = document.getElementById('postText').textContent.trim(); const hasMedia = currentLinkPreview !== null || currentImagePreview !== null; document.getElementById('postBtn').disabled = !((text.length > 0 || hasMedia) && !isPreviewLoading); };
-        document.getElementById('postText').addEventListener('input', window.updatePostBtn);
-
-        window.createPost = async function() {
-            if(!currentUser) return window.openLoginModal();
-            if(!currentUser.handle && currentContext.type === 'home') { document.getElementById('profileSetupModal').classList.add('open'); return showToast("Create profile first!", "info"); }
-            const text = document.getElementById('postText').textContent.trim(); document.getElementById('postBtn').disabled = true;
-            const isPagePost = currentContext.type === 'page';
-            const postData = { text: text, author: isPagePost ? currentContext.data.name : (currentUser.name || currentUser.displayName), authorHandle: isPagePost ? currentContext.data.category : currentUser.handle, authorPic: isPagePost ? currentContext.data.logo : (currentUser.photo || currentUser.photoURL), pageId: isPagePost ? currentContext.id : null, link: currentLinkPreview || null, image: currentImagePreview || null, createdAt: serverTimestamp() };
-            if(db) { try { await addDoc(collection(db, "posts"), postData); showToast("Posted!", "success"); document.getElementById('postText').textContent = ''; window.clearLink(); window.clearImage(); } catch(e) { window.updatePostBtn(); } }
+        window.openAdminPanel = function() {
+            document.getElementById('adminPanelModal').classList.add('open');
+            window.showAdminTab('overview');
         };
 
-        if(db) {
-            const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => { allPostsArray = []; snapshot.forEach((doc) => { const data = doc.data(); if(data.author && data.author !== 'undefined') allPostsArray.push({id: doc.id, ...data}); }); window.renderFeed(); });
-        }
+        window.closeAdminPanel = function() {
+            document.getElementById('adminPanelModal').classList.remove('open');
+        };
 
-        window.toggleLike = function(btn) { const dislikeBtn = btn.nextElementSibling; if(dislikeBtn.classList.contains('text-red-500')) { dislikeBtn.classList.remove('text-red-500'); } btn.classList.toggle('text-blue-500'); };
-        window.toggleDislike = function(btn) { const likeBtn = btn.previousElementSibling; if(likeBtn.classList.contains('text-blue-500')) { likeBtn.classList.remove('text-blue-500'); } btn.classList.toggle('text-red-500'); };
-        window.toggleComment = function(postId) { const commentSection = document.getElementById(`comment-section-${postId}`); if(commentSection) { commentSection.classList.toggle('hidden'); if(!commentSection.classList.contains('hidden')) commentSection.querySelector('input').focus(); } };
-        window.sharePost = function(text, url) { if (navigator.share) { navigator.share({ title: 'LinkVibe Post', text: text, url: url || window.location.href }); } else { navigator.clipboard.writeText(window.location.href); window.showToast("Link copied!", "success"); } };
+        /* ORIGINAL ADMIN TABS */
+        window.showAdminTab = function(tab) {
+            document.querySelectorAll('.admin-sidebar-link').forEach(el => el.classList.remove('active'));
+            if(event && event.target) event.target.closest('.admin-sidebar-link')?.classList.add('active');
+            const content = document.getElementById('adminContent');
 
-        window.renderFeed = function() {
-            const container = document.getElementById('feedContainer'); container.innerHTML = '';
-            let postsToShow = allPostsArray; if(currentContext.type === 'page') { postsToShow = allPostsArray.filter(p => p.pageId === currentContext.id); }
-            if(postsToShow.length === 0) { container.innerHTML = '<div class="text-center text-[var(--muted)] py-10 text-sm">No posts yet.</div>'; return; }
+            if (tab === 'overview') {
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">Dashboard Overview</h3>
+                    <p class="text-sm mb-6" style="color:var(--muted);">Your network at a glance.</p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:24px;">
+                        <div class="admin-stat-card"><div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Total Users</div><div style="font-size:2rem; font-weight:800; color:var(--accent); margin-top:4px;">${dummyUsers.length + (currentUser?1:0)}</div></div>
+                        <div class="admin-stat-card"><div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Total Posts</div><div style="font-size:2rem; font-weight:800; color:var(--accent); margin-top:4px;">${allPostsArray.length}</div></div>
+                        <div class="admin-stat-card"><div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Online Now</div><div style="font-size:2rem; font-weight:800; color:var(--success); margin-top:4px;">${dummyUsers.length}</div></div>
+                        <div class="admin-stat-card"><div style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px;">Admin Status</div><div style="font-size:2rem; font-weight:800; color:var(--success); margin-top:4px;"><i class="fas fa-check-circle"></i></div></div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-3">Recent Activity</h4>
+                    <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+                        ${allPostsArray.slice(0,5).map(p => `<div style="padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px;"><img src="${p.authorPic}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;"><div><span class="text-sm font-semibold">${p.author}</span> <span class="text-xs" style="color:var(--muted);">posted</span></div></div>`).join('')}
+                        ${allPostsArray.length === 0 ? '<div style="padding:20px; text-align:center; color:var(--muted); font-size:0.85rem;">No recent activity</div>' : ''}
+                    </div>`;
+            }
+            else if (tab === 'users') {
+                const allUsers = [...dummyUsers];
+                if (currentUser) allUsers.unshift({ name: currentUser.name || 'Current User', role: currentUser.handle || 'Admin', color: '1B6B5A', isCurrent: true });
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">User Management</h3>
+                    <p class="text-sm mb-6" style="color:var(--muted);">View and manage all registered users.</p>
+                    <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden;">
+                        <table class="admin-table">
+                            <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody>
+                                ${allUsers.map(u => `<tr>
+                                    <td><div style="display:flex; align-items:center; gap:10px;"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=${u.color}&color=fff&size=64" style="width:36px; height:36px; border-radius:50%; object-fit:cover;"><span class="font-semibold">${u.name}</span></div></td>
+                                    <td style="color:var(--muted);">${u.role}</td>
+                                    <td><span style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; font-weight:600; color:var(--success);"><i class="fas fa-circle" style="font-size:0.4rem;"></i> Online</span></td>
+                                    <td><button class="btn-ghost" style="padding:4px 10px; font-size:0.75rem;" onclick="window.showToast('Feature coming soon','info')"><i class="fas fa-edit"></i></button>${!u.isCurrent ? `<button class="btn-ghost" style="padding:4px 10px; font-size:0.75rem; color:var(--danger);" onclick="window.showToast('User removed','success')"><i class="fas fa-trash"></i></button>` : ''}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>`;
+            }
+            else if (tab === 'posts') {
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">Post Management</h3>
+                    <p class="text-sm mb-4" style="color:var(--muted);">Manage all posts in the network.</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <span class="text-sm font-semibold">${allPostsArray.length} posts total</span>
+                        <button class="btn-ghost" onclick="window.showToast('Refreshed','success')"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        ${allPostsArray.map(p => `
+                            <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; display:flex; gap:12px; align-items:flex-start;">
+                                <img src="${p.authorPic}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+                                <div style="flex:1; min-width:0;">
+                                    <div class="font-semibold text-sm">${p.author}</div>
+                                    <p class="text-sm" style="color:var(--muted); margin-top:4px; word-break:break-word;">${(p.text || '').substring(0,120)}${(p.text||'').length>120?'...':''}</p>
+                                    ${p.link ? `<div style="margin-top:4px;"><a href="${p.link}" target="_blank" style="color:var(--accent); font-size:0.8rem; font-weight:600;"><i class="fas fa-external-link-alt mr-1"></i>${p.link.substring(0,40)}...</a></div>` : ''}
+                                </div>
+                                <button class="btn-ghost" style="padding:6px 10px; color:var(--danger); flex-shrink:0;" onclick="window.adminDeletePost('${p.id}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        `).join('')}
+                        ${allPostsArray.length === 0 ? '<div style="text-align:center; padding:40px; color:var(--muted);">No posts yet.</div>' : ''}
+                    </div>`;
+            }
+            else if (tab === 'settings') {
+                const savedSettings = JSON.parse(localStorage.getItem('ff_settings') || '{}');
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">Site Settings</h3>
+                    <p class="text-sm mb-6" style="color:var(--muted);">Configure your network behavior.</p>
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Allow New Registrations</div><div class="text-xs" style="color:var(--muted);">Enable or disable new user sign-ups.</div></div>
+                            <button class="admin-toggle ${savedSettings.allowSignup !== false ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAdminSetting('allowSignup', this.classList.contains('on'))"></button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Allow Post Creation</div><div class="text-xs" style="color:var(--muted);">Let users publish new posts.</div></div>
+                            <button class="admin-toggle ${savedSettings.allowPosts !== false ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAdminSetting('allowPosts', this.classList.contains('on'))"></button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Allow Links in Posts</div><div class="text-xs" style="color:var(--muted);">Let users attach URLs to their posts.</div></div>
+                            <button class="admin-toggle ${savedSettings.allowLinks !== false ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAdminSetting('allowLinks', this.classList.contains('on'))"></button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Show Online Status</div><div class="text-xs" style="color:var(--muted);">Display green dot for online users.</div></div>
+                            <button class="admin-toggle ${savedSettings.showOnline !== false ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAdminSetting('showOnline', this.classList.contains('on'))"></button>
+                        </div>
+                        <div style="padding:16px; background:var(--bg); border-radius:12px;">
+                            <div class="font-semibold text-sm mb-2">Max Posts in Feed</div>
+                            <input type="number" id="adminMaxPosts" value="${savedSettings.maxPosts || 25}" min="5" max="100" class="text-sm" style="width:100px; padding:8px 12px;">
+                            <button class="btn-primary text-xs ml-2" style="padding:8px 16px;" onclick="window.saveAdminSetting('maxPosts', parseInt(document.getElementById('adminMaxPosts').value)); window.showToast('Saved','success')">Save</button>
+                        </div>
+                        <div style="padding:16px; background:var(--bg); border-radius:12px;">
+                            <div class="font-semibold text-sm mb-2">Welcome Message</div>
+                            <input type="text" id="adminWelcomeMsg" value="${savedSettings.welcomeMsg || 'Connect with professionals in your industry.'}" class="w-full text-sm" style="padding:8px 12px;">
+                            <button class="btn-primary text-xs mt-2" style="padding:8px 16px;" onclick="window.saveAdminSetting('welcomeMsg', document.getElementById('adminWelcomeMsg').value); window.showToast('Saved','success')">Save</button>
+                        </div>
+                    </div>`;
+            }
+            else if (tab === 'appearance') {
+                const savedAppearance = JSON.parse(localStorage.getItem('ff_appearance') || '{}');
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">Appearance</h3>
+                    <p class="text-sm mb-6" style="color:var(--muted);">Customize how your network looks.</p>
+                    <div style="display:flex; flex-direction:column; gap:20px;">
+                        <div style="padding:16px; background:var(--bg); border-radius:12px;">
+                            <div class="font-semibold text-sm mb-3">Accent Color</div>
+                            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                ${['#1B6B5A','#0A66C2','#7C3AED','#E74C3C','#F39C12','#EC4899','#059669','#1D4ED8'].map(c => `<div onclick="window.changeAccentColor('${c}')" style="width:36px; height:36px; background:${c}; border-radius:50%; cursor:pointer; border:3px solid ${savedAppearance.accent === c ? 'var(--text)' : 'transparent'}; transition:all 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></div>`).join('')}
+                            </div>
+                        </div>
+                        <div style="padding:16px; background:var(--bg); border-radius:12px;">
+                            <div class="font-semibold text-sm mb-2">Site Name</div>
+                            <input type="text" id="adminSiteName" value="${savedAppearance.siteName || 'FriendsFlow'}" class="w-full text-sm" style="padding:8px 12px;">
+                            <button class="btn-primary text-xs mt-2" style="padding:8px 16px;" onclick="window.saveAppearance('siteName', document.getElementById('adminSiteName').value)">Save</button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Show Right Sidebar</div><div class="text-xs" style="color:var(--muted);">Trending and suggestions panel.</div></div>
+                            <button class="admin-toggle ${savedAppearance.showRightSidebar !== false ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAppearance('showRightSidebar', this.classList.contains('on'))"></button>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--bg); border-radius:12px;">
+                            <div><div class="font-semibold text-sm">Compact Post Cards</div><div class="text-xs" style="color:var(--muted);">Smaller padding and font in feed.</div></div>
+                            <button class="admin-toggle ${savedAppearance.compactPosts === true ? 'on' : ''}" onclick="this.classList.toggle('on'); window.saveAppearance('compactPosts', this.classList.contains('on'))"></button>
+                        </div>
+                    </div>`;
+            }
+            else if (tab === 'danger') {
+                content.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1" style="color:var(--danger);">Danger Zone</h3>
+                    <p class="text-sm mb-6" style="color:var(--muted);">Irreversible actions. Proceed with caution.</p>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div style="padding:20px; border:1px solid var(--danger); border-radius:12px; background:rgba(231,76,60,0.03);">
+                            <div class="font-semibold text-sm mb-1">Delete All Posts</div>
+                            <p class="text-xs mb-3" style="color:var(--muted);">Permanently remove every post from the database. This cannot be undone.</p>
+                            <button class="btn-danger" onclick="window.adminDeleteAllPosts()"><i class="fas fa-trash mr-1"></i> Delete All Posts</button>
+                        </div>
+                        <div style="padding:20px; border:1px solid var(--danger); border-radius:12px; background:rgba(231,76,60,0.03);">
+                            <div class="font-semibold text-sm mb-1">Reset All Settings</div>
+                            <p class="text-xs mb-3" style="color:var(--muted);">Clear all admin configurations and restore defaults.</p>
+                            <button class="btn-danger" onclick="localStorage.removeItem('ff_settings'); localStorage.removeItem('ff_appearance'); window.showToast('Settings reset to defaults','success')"><i class="fas fa-undo mr-1"></i> Reset Settings</button>
+                        </div>
+                        <div style="padding:20px; border:1px solid var(--danger); border-radius:12px; background:rgba(231,76,60,0.03);">
+                            <div class="font-semibold text-sm mb-1">Revoke Admin Access</div>
+                            <p class="text-xs mb-3" style="color:var(--muted);">Log out of admin mode. You will need to re-enter the password.</p>
+                            <button class="btn-danger" onclick="adminUnlocked=false; window.closeAdminPanel(); window.showToast('Admin access revoked','info')"><i class="fas fa-shield-alt mr-1"></i> Revoke Access</button>
+                        </div>
+                    </div>`;
+            }
+        };
 
-            postsToShow.forEach((post) => {
-                let mediaHTML = '';
-                if(post.link) { mediaHTML = `<div class="link-preview mt-2" onclick="window.open('${post.link.url}', '_blank')"><img src="${post.link.image}" class="link-preview-img"><div class="p-2 text-xs"><div class="text-teal-500"><i class="fas fa-globe"></i> ${post.link.domain}</div></div></div>`; } 
-                else if(post.image) { mediaHTML = `<img src="${post.image}" class="mt-2 w-full object-contain rounded-xl border border-[var(--border)]" style="max-height: 400px; background:var(--bg2);">`; }
-                const handleDisplay = post.authorHandle && post.authorHandle !== 'undefined' ? `<div class="text-[0.7rem] text-[var(--muted)]">${post.authorHandle}</div>` : `<div class="text-[0.7rem] text-[var(--muted)]">Just Now</div>`;
-                const textDisplay = post.text && post.text !== 'undefined' ? post.text : '';
-                const pageBadge = (currentContext.type === 'home' && post.pageId) ? `<i class="fas fa-check-circle text-teal-500 text-xs ml-1" title="Official Page"></i>` : '';
+        window.saveAdminSetting = function(key, value) {
+            const s = JSON.parse(localStorage.getItem('ff_settings') || '{}');
+            s[key] = value;
+            localStorage.setItem('ff_settings', JSON.stringify(s));
+            showToast('Setting saved', 'success');
+        };
 
-                const actionButtons = `<div class="border-t mt-3 pt-2 flex items-center justify-between text-[var(--text2)]" style="border-color:var(--border);"><div class="flex gap-4"><button onclick="window.toggleLike(this)" class="transition flex items-center gap-1.5"><i class="fas fa-thumbs-up"></i> <span class="text-xs hidden sm:inline">Like</span></button><button onclick="window.toggleDislike(this)" class="transition flex items-center gap-1.5"><i class="fas fa-thumbs-down"></i> <span class="text-xs hidden sm:inline">Dislike</span></button><button onclick="window.toggleComment('${post.id}')" class="hover:text-teal-500 transition flex items-center gap-1.5"><i class="fas fa-comment"></i> <span class="text-xs hidden sm:inline">Comment</span></button></div><button onclick="window.sharePost('${textDisplay.substring(0, 30)}...')" class="hover:text-green-500 transition flex items-center gap-1.5"><i class="fas fa-share"></i> <span class="text-xs hidden sm:inline">Share</span></button></div><div id="comment-section-${post.id}" class="hidden mt-3"><div class="flex items-center gap-2"><img src="${currentUser ? (currentUser.photo || currentUser.photoURL) : 'https://ui-avatars.com/api/?name=G'}" class="w-6 h-6 rounded-full"><input type="text" placeholder="Write a comment..." class="flex-1 bg-transparent border-b outline-none text-xs py-1" style="border-color:var(--border); color:var(--text);" onkeypress="if(event.key === 'Enter') { this.value=''; window.showToast('Comment posted!', 'success'); window.toggleComment('${post.id}'); }"></div></div>`;
-                const followBtn = `<button onclick="window.showToast('Followed ${post.author}!', 'success')" class="text-orange-500 text-[0.65rem] font-semibold border border-orange-500 px-2 py-1 rounded-full"><i class="fas fa-plus"></i> Follow</button>`;
+        window.saveAppearance = function(key, value) {
+            const a = JSON.parse(localStorage.getItem('ff_appearance') || '{}');
+            a[key] = value;
+            localStorage.setItem('ff_appearance', JSON.stringify(a));
+            if (key === 'siteName') {
+                const logo = document.querySelector('.logo');
+                if(logo) logo.childNodes[0].textContent = value;
+            }
+            if (key === 'showRightSidebar') {
+                document.getElementById('homeRightSidebar').style.display = value ? '' : 'none';
+            }
+            showToast('Appearance updated', 'success');
+        };
 
-                container.innerHTML += `<article class="card p-4 mb-4"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><img src="${post.authorPic}" class="w-8 h-8 rounded-full object-cover"><div><div class="font-bold text-sm font-display flex items-center text-[var(--text)]">${post.author} ${pageBadge}</div>${handleDisplay}</div></div>${followBtn}</div><p class="text-[0.85rem] leading-relaxed whitespace-pre-wrap text-[var(--text)]">${textDisplay}</p>${mediaHTML}${actionButtons}</article>`;
-            });
-        }
+        window.changeAccentColor = function(color) {
+            document.documentElement.style.setProperty('--accent', color);
+            const a = JSON.parse(localStorage.getItem('ff_appearance') || '{}');
+            a.accent = color;
+            localStorage.setItem('ff_appearance', JSON.stringify(a));
+            showToast('Accent color changed', 'success');
+            window.showAdminTab('appearance');
+        };
+
+        window.adminDeletePost = async function(postId) {
+            if (!db || !postId) return;
+            try {
+                await deleteDoc(doc(db, "posts", postId));
+                showToast('Post deleted', 'success');
+            } catch(e) {
+                showToast('Error deleting post', 'error');
+            }
+        };
+
+        window.adminDeleteAllPosts = async function() {
+            if (!db) return;
+            try {
+                const snapshot = await getDocs(collection(db, "posts"));
+                const delPromises = [];
+                snapshot.forEach(d => delPromises.push(deleteDoc(d.ref)));
+                await Promise.all(delPromises);
+                showToast('All posts deleted', 'success');
+            } catch(e) {
+                showToast('Error deleting posts', 'error');
+            }
+        };
+
+        /* ====== TOGGLE / UTILITY ====== */
+        window.toggleMenu = () => document.getElementById('profileMenu').classList.toggle('show');
+        document.addEventListener('click', (e) => {
+            const ps = document.getElementById('userProfileSection');
+            const pm = document.getElementById('profileMenu');
+            if (ps && pm && !ps.contains(e.target) && !pm.contains(e.target)) pm.classList.remove('show');
+        });
 
         window.openLoginModal = () => document.getElementById('loginModal').classList.add('open');
         window.closeLoginModal = () => document.getElementById('loginModal').classList.remove('open');
-        window.openProfileModal = () => { document.getElementById('profileMenu').style.display = 'none'; if(!currentUser) return window.openLoginModal(); document.getElementById('profileSetupModal').classList.add('open'); };
-        window.toggleMenu = () => { const m = document.getElementById('profileMenu'); m.style.display = m.style.display === 'none' ? 'block' : 'none'; };
-        window.showToast = function(message, type = 'info') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast`; const icon = type === 'success' ? 'fa-check-circle text-teal-500' : type === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-orange-500'; toast.innerHTML = `<i class="fas ${icon}"></i><span class="text-sm">${message}</span>`; container.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+        window.openProfileModal = () => {
+            document.getElementById('profileMenu').classList.remove('show');
+            if (!currentUser) return window.openLoginModal();
+            document.getElementById('profileSetupModal').classList.add('open');
+        };
+
+        window.showToast = function(msg, type = 'info') {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            const icons = { info: 'fa-info-circle', error: 'fa-exclamation-circle', success: 'fa-check-circle' };
+            const colors = { info: 'var(--accent)', error: 'var(--danger)', success: 'var(--success)' };
+            t.innerHTML = `<i class="fas ${icons[type]||icons.info}" style="color:${colors[type]}; font-size:1.1rem;"></i><span style="flex:1;">${msg}</span>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3500);
+        };
+
+        /* ====== AUTH ====== */
+        const provider = new GoogleAuthProvider();
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            if (!auth) return;
+            try {
+                const result = await signInWithPopup(auth, provider);
+                window.closeLoginModal();
+                checkAndCreateProfile(result.user);
+            } catch (e) {
+                if (e.code !== 'auth/popup-closed-by-user') showToast('Login failed', 'error');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (auth) signOut(auth);
+            currentUser = null;
+            document.getElementById('profileMenu').classList.remove('show');
+            updateNavbarUI();
+            showToast('Signed out', 'success');
+        });
+
+        async function checkAndCreateProfile(user) {
+            document.getElementById('displayNameInput').value = user.displayName || '';
+            document.getElementById('usernameInput').value = user.email ? user.email.split('@')[0] : '';
+            document.getElementById('profileAvatarPreview').src = user.photoURL || 'https://ui-avatars.com/api/?name=U&background=1B6B5A&color=fff&size=128';
+            if (db) {
+                const snap = await getDoc(doc(db, 'users', user.uid));
+                if (snap.exists()) {
+                    currentUser = { ...user, ...snap.data() };
+                    updateNavbarUI();
+                    showToast(`Welcome back, ${currentUser.name||'User'}!`, 'success');
+                } else {
+                    currentUser = user;
+                    window.openProfileModal();
+                }
+            }
+        }
+
+        window.handleProfileAvatarUpload = function(e) {
+            const f = e.target.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = (ev) => document.getElementById('profileAvatarPreview').src = ev.target.result;
+            r.readAsDataURL(f);
+        };
+
+        document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+            const name = document.getElementById('displayNameInput').value.trim();
+            const title = document.getElementById('usernameInput').value.trim();
+            if (!name) return showToast('Name is required', 'error');
+            const data = { name, handle: title, photo: document.getElementById('profileAvatarPreview').src, createdAt: serverTimestamp() };
+            if (db && currentUser) {
+                try {
+                    await setDoc(doc(db, 'users', currentUser.uid), data, { merge: true });
+                    currentUser = { ...currentUser, ...data };
+                    updateNavbarUI();
+                    document.getElementById('profileSetupModal').classList.remove('open');
+                    showToast('Profile saved!', 'success');
+                } catch(e) { showToast('Error saving profile', 'error'); }
+            }
+        });
+
+        function updateNavbarUI() {
+            const s = document.getElementById('userProfileSection');
+            if (currentUser) {
+                const photo = currentUser.photo || currentUser.photoURL || 'https://ui-avatars.com/api/?name=U&background=1B6B5A&color=fff&size=64';
+                s.innerHTML = `<img src="${photo}" style="width:36px; height:36px; border-radius:50%; border:2px solid var(--border); object-fit:cover; cursor:pointer;">`;
+                document.getElementById('creatorAvatar').src = photo;
+                document.getElementById('sidebarUserAvatar').src = photo;
+                document.getElementById('sidebarUserName').textContent = currentUser.name || 'User';
+                document.getElementById('sidebarUserHandle').textContent = currentUser.handle || 'Professional Member';
+            } else {
+                s.innerHTML = `<button class="btn-primary text-xs py-1.5 px-4" onclick="window.openLoginModal()">Sign In</button>`;
+                document.getElementById('creatorAvatar').src = 'https://ui-avatars.com/api/?name=G&background=1B6B5A&color=fff&size=96';
+                document.getElementById('sidebarUserName').textContent = 'Guest User';
+                document.getElementById('sidebarUserHandle').textContent = 'Sign in to connect';
+            }
+        }
+
+        if (auth) {
+            onAuthStateChanged(auth, async (user) => {
+                if (user && db) {
+                    const snap = await getDoc(doc(db, 'users', user.uid));
+                    if (snap.exists()) { currentUser = { ...user, ...snap.data() }; updateNavbarUI(); }
+                    else { currentUser = user; window.openProfileModal(); }
+                } else { currentUser = null; updateNavbarUI(); }
+            });
+        }
+
+        /* ====== LINK IN POST ====== */
+        let currentPostLink = null;
+
+        window.showLinkInput = function() {
+            document.getElementById('linkInputArea').style.display = 'flex';
+            document.getElementById('postLinkInput').focus();
+        };
+
+        window.removeLinkInput = function() {
+            document.getElementById('linkInputArea').style.display = 'none';
+            document.getElementById('postLinkInput').value = '';
+        };
+
+        document.getElementById('postLinkInput')?.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const url = this.value.trim();
+                if (url) {
+                    currentPostLink = url;
+                    document.getElementById('linkInputArea').style.display = 'none';
+                    document.getElementById('linkTagArea').style.display = 'inline-flex';
+                    document.getElementById('linkTagText').textContent = url.length > 40 ? url.substring(0,40) + '...' : url;
+                    this.value = '';
+                    updatePostBtn();
+                }
+            }
+        });
+
+        window.removeLink = function() {
+            currentPostLink = null;
+            document.getElementById('linkTagArea').style.display = 'none';
+            document.getElementById('linkTagText').textContent = '';
+            updatePostBtn();
+        };
+
+        /* ====== POST LOGIC & AI MODERATION (NSFWJS) ====== */
+        let currentImagePreview = null;
+        let nsfwModel = null;
+
+        // Initialize NSFWJS Model silently in background
+        if (typeof nsfwjs !== 'undefined') {
+            nsfwjs.load().then(model => { 
+                nsfwModel = model; 
+                console.log("Free AI Safety Model Loaded successfully."); 
+            }).catch(err => console.error("Safety Model load failed", err));
+        }
+
+        window.handleImageUpload = async function(e) {
+            const f = e.target.files[0]; if (!f) return;
+            
+            window.showToast('Scanning image for safety...', 'info');
+            document.getElementById('postBtn').disabled = true;
+
+            const r = new FileReader();
+            r.onload = async (ev) => { 
+                const imgElement = new Image();
+                imgElement.src = ev.target.result;
+                
+                imgElement.onload = async () => {
+                    // Check image with AI model before showing preview
+                    if (nsfwModel) {
+                        try {
+                            const predictions = await nsfwModel.classify(imgElement);
+                            const isUnsafe = predictions.some(p => 
+                                (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.6
+                            );
+                            
+                            if (isUnsafe) {
+                                window.showToast('🚫 Inappropriate image detected! Upload blocked.', 'error');
+                                window.clearImage();
+                                return; // Block upload completely
+                            }
+                        } catch (err) {
+                            console.error("Image classification error", err);
+                        }
+                    }
+                    
+                    // If safe, allow preview
+                    currentImagePreview = ev.target.result; 
+                    document.getElementById('uploadedImage').src = currentImagePreview; 
+                    document.getElementById('imagePreviewArea').style.display = 'block'; 
+                    updatePostBtn();
+                    window.showToast('Image is safe ✓', 'success');
+                };
+            };
+            r.readAsDataURL(f);
+        };
+
+        window.clearImage = function() { 
+            document.getElementById('imageInput').value = ''; 
+            currentImagePreview = null; 
+            document.getElementById('imagePreviewArea').style.display = 'none'; 
+            updatePostBtn(); 
+        };
+
+        function updatePostBtn() {
+            const text = document.getElementById('postText').value.trim();
+            document.getElementById('postBtn').disabled = !(text.length > 0 || currentImagePreview || currentPostLink);
+        }
+        document.getElementById('postText').addEventListener('input', updatePostBtn);
+
+        // Spam Filter Keywords
+        const spamBlacklist = [
+            "free-money", "casino", "betting", "xxx", "porn", "viagra", 
+            "earn-fast", "click-here", "lottery", "crypto-giveaway", "scam-link.com"
+        ];
+
+        function isSpam(text) {
+            if (!text) return false;
+            const lowerText = text.toLowerCase();
+            return spamBlacklist.some(keyword => lowerText.includes(keyword));
+        }
+
+        window.createPost = async function() {
+            if (!currentUser) return window.openLoginModal();
+            const text = document.getElementById('postText').value.trim();
+            
+            // Spam validation
+            if (isSpam(text) || isSpam(currentPostLink)) {
+                window.showToast('🚫 Your post contains blocked or spammy content.', 'error');
+                return;
+            }
+
+            document.getElementById('postBtn').disabled = true;
+
+            const post = {
+                text, 
+                uid: currentUser.uid, 
+                author: currentUser.name || 'User',
+                authorPic: currentUser.photo || 'https://ui-avatars.com/api/?name=U&background=1B6B5A&color=fff&size=64',
+                authorHandle: currentUser.handle || 'Member',
+                image: currentImagePreview,
+                link: currentPostLink,
+                likes: 0,
+                createdAt: serverTimestamp()
+            };
+
+            if (db) {
+                try {
+                    await addDoc(collection(db, 'posts'), post);
+                    document.getElementById('postText').value = '';
+                    window.clearImage();
+                    window.removeLink();
+                    window.showToast('Post published!', 'success');
+                } catch(e) { 
+                    window.showToast('Error posting', 'error'); 
+                    document.getElementById('postBtn').disabled = false; 
+                }
+            }
+        };
+
+        /* ====== FETCH POSTS ====== */
+        if (db) {
+            const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'), limit(25));
+            onSnapshot(q, (snap) => {
+                allPostsArray = [];
+                snap.forEach(d => allPostsArray.push({ id: d.id, ...d.data() }));
+                renderFeed();
+            });
+        }
+
+        function timeAgo(ts) {
+            if (!ts) return 'Just now';
+            const now = Date.now();
+            const then = ts.toMillis ? ts.toMillis() : new Date(ts).getTime();
+            const diff = Math.floor((now - then) / 1000);
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff/60)}m`;
+            if (diff < 86400) return `${Math.floor(diff/3600)}h`;
+            if (diff < 604800) return `${Math.floor(diff/86400)}d`;
+            return `${Math.floor(diff/604800)}w`;
+        }
+
+        window.renderFeed = function() {
+            const c = document.getElementById('feedContainer');
+            if (!allPostsArray.length) {
+                c.innerHTML = `<div class="text-center py-16" style="color:var(--muted);"><div style="width:64px; height:64px; margin:0 auto 16px; background:var(--accent-light); border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-pen-fancy text-xl" style="color:var(--accent);"></i></div><p class="text-sm font-semibold" style="color:var(--text);">No posts yet</p><p class="text-xs mt-1">Be the first to share something.</p></div>`;
+                return;
+            }
+            let html = '';
+            allPostsArray.forEach((post, i) => {
+                const imgHtml = post.image ? `<div><img src="${post.image}" style="width:100%; max-height:420px; object-fit:cover;"></div>` : '';
+                const linkHtml = post.link ? `<a href="${post.link}" target="_blank" rel="noopener" class="link-preview"><i class="fas fa-external-link-alt"></i> ${post.link.length > 50 ? post.link.substring(0,50)+'...' : post.link}</a>` : '';
+                const time = timeAgo(post.createdAt);
+                html += `
+                <article class="card post-card fade-in" style="animation-delay:${i<5?i*0.05:0}s;">
+                    <div class="p-4 pb-2 flex items-start gap-3">
+                        <img src="${post.authorPic}" style="width:44px; height:44px; border-radius:50%; border:2px solid var(--border); object-fit:cover;">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold text-sm cursor-pointer transition" style="color:var(--text);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">${post.author}</h4>
+                                <button class="btn-ghost" style="padding:2px 6px;"><i class="fas fa-ellipsis-h text-xs"></i></button>
+                            </div>
+                            <p class="text-xs" style="color:var(--muted);">${post.authorHandle||'Member'}</p>
+                            <p class="time-ago" style="font-size:0.7rem; margin-top:2px;">${time}</p>
+                        </div>
+                    </div>
+                    <div class="px-4 py-2"><p class="text-sm whitespace-pre-wrap" style="color:var(--text); line-height:1.65;">${post.text||''}</p></div>
+                    ${imgHtml}
+                    ${linkHtml ? `<div class="px-4 pb-2">${linkHtml}</div>` : ''}
+                    <div style="padding:8px 16px; border-top:1px solid var(--border); margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <button class="post-action-btn" onclick="this.classList.toggle('liked')"><i class="far fa-thumbs-up"></i> Like</button>
+                        <button class="post-action-btn"><i class="far fa-comment"></i> Comment</button>
+                        <button class="post-action-btn"><i class="fas fa-share"></i> Share</button>
+                        <button class="post-action-btn"><i class="far fa-bookmark"></i> Save</button>
+                    </div>
+                </article>`;
+            });
+            c.innerHTML = html;
+        };
+
+        /* ====== ONLINE USERS ====== */
+        window.openOnlineUsersModal = function() {
+            document.getElementById('onlineUsersModal').classList.add('open');
+            const list = document.getElementById('modalUsersList');
+            list.innerHTML = dummyUsers.map(u => `<div class="user-list-item"><div style="position:relative;"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=${u.color}&color=fff&size=64" style="width:42px; height:42px; border-radius:50%; object-fit:cover;"><div class="status-online"></div></div><div class="flex-1"><h4 class="text-sm font-bold">${u.name}</h4><p class="text-xs" style="color:var(--muted);">${u.role}</p></div><button class="btn-outline text-xs" style="padding:4px 12px;">Connect</button></div>`).join('');
+            document.querySelectorAll('.navbarOnlineCount').forEach(el => el.textContent = dummyUsers.length);
+        };
+
+        /* ====== SUGGESTED PEOPLE ====== */
+        (function() {
+            const c = document.getElementById('suggestedPeople'); if (!c) return;
+            c.innerHTML = dummyUsers.slice(0,3).map(u => `<div class="flex items-center gap-3"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=${u.color}&color=fff&size=64" style="width:40px; height:40px; border-radius:50%; object-fit:cover;"><div class="flex-1 min-w-0"><h4 class="text-xs font-bold truncate">${u.name}</h4><p class="text-xs truncate" style="color:var(--muted); font-size:0.65rem;">${u.role}</p></div><button class="btn-outline text-xs" style="padding:3px 10px; font-size:0.7rem;">Connect</button></div>`).join('');
+        })();
+
+        /* ====== RESTORE APPEARANCE ====== */
+        (function() {
+            const a = JSON.parse(localStorage.getItem('ff_appearance') || '{}');
+            if (a.accent) document.documentElement.style.setProperty('--accent', a.accent);
+            if (a.siteName) {
+                const logoText = document.querySelector('.logo');
+                if (logoText) logoText.childNodes[0].textContent = a.siteName;
+            }
+            if (a.showRightSidebar === false) document.getElementById('homeRightSidebar').style.display = 'none';
+        })();
+
+        updateNavbarUI();
     </script>
 </body>
 </html>

@@ -151,13 +151,8 @@
             </div>
             
             <div class="flex items-center gap-3 relative">
-                <!-- Dark Mode Toggle -->
-                <button onclick="window.toggleDarkMode()" class="text-[var(--text2)] hover:text-orange-500 transition px-2">
-                    <i id="darkModeIcon" class="fas fa-moon"></i>
-                </button>
-
+                <button onclick="window.toggleDarkMode()" class="text-[var(--text2)] hover:text-orange-500 transition px-2"><i id="darkModeIcon" class="fas fa-moon"></i></button>
                 <div id="userProfileSection"></div>
-                
                 <div id="profileMenu" style="display:none;position:absolute;top:45px;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.5rem;box-shadow:var(--shadow-hover);min-width:160px;z-index:50;">
                     <button onclick="window.openProfileModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-user-edit text-orange-500 w-4"></i> Edit Profile</button>
                     <button onclick="window.openCreatePageModal()" class="w-full text-left flex items-center gap-2 p-2 rounded-lg text-sm hover:bg-[var(--bg2)]"><i class="fas fa-flag text-teal-500 w-4"></i> Create Page</button>
@@ -170,8 +165,6 @@
 
     <!-- MAIN HOME VIEW -->
     <main id="homeView" class="max-w-3xl mx-auto px-4 py-6 transition-all duration-300">
-        
-        <!-- Page Header (Hidden on Home) -->
         <div id="activePageHeader" class="hidden mb-6 card overflow-hidden relative">
             <button onclick="window.closePageView()" class="absolute top-4 left-4 z-20 text-[var(--text)] p-2 w-8 h-8 rounded-full shadow-md flex items-center justify-center" style="background:var(--card);"><i class="fas fa-arrow-left text-sm"></i></button>
             <div id="viewPageCover" class="h-32 w-full bg-cover bg-center relative"><div class="absolute inset-0 bg-black/40"></div></div>
@@ -184,32 +177,27 @@
             </div>
         </div>
 
-        <!-- My Pages -->
         <div id="myPagesSection" class="hidden mb-6">
             <h3 class="font-display font-bold text-sm mb-3 uppercase tracking-wide text-[var(--text2)]">My Pages</h3>
             <div id="pagesContainer" class="flex gap-3 overflow-x-auto pb-2"></div>
         </div>
 
-        <!-- Post Creator -->
         <div class="card p-4 mb-6" id="postCreatorCard">
             <div class="flex items-start gap-3">
                 <img id="creatorAvatar" src="https://ui-avatars.com/api/?name=Guest" class="avatar" alt="Author">
                 <div style="flex:1;">
                     <div contenteditable="true" id="postText" class="outline-none min-h-[40px] py-1 text-sm text-[var(--text)]" data-placeholder="What's on your mind?"></div>
-                    
                     <div class="link-bar flex items-center gap-2 p-2 mt-2">
                         <i class="fas fa-link text-orange-500 text-xs ml-1"></i>
                         <input type="text" id="linkInput" placeholder="Paste link here..." oninput="window.handleLinkInput(this.value)">
                         <button id="clearLinkBtn" class="hidden text-[var(--muted)]" onclick="window.clearLink()"><i class="fas fa-times text-xs"></i></button>
                     </div>
                     <div id="linkPreviewArea" style="display:none;margin-top:10px;"></div>
-                    
                     <div id="imagePreviewArea" style="display:none; margin-top:10px; position:relative;">
                         <img id="uploadedImage" src="" style="width:100%; max-height:250px; object-contain border-radius:12px; border:1px solid var(--border);">
                         <button onclick="window.clearImage()" style="position:absolute; top:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; w:24px; h:24px;"><i class="fas fa-times text-xs"></i></button>
                     </div>
                     <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
-                    
                     <div class="flex items-center justify-between mt-3 pt-2 border-t" style="border-color:var(--border);">
                         <button onclick="document.getElementById('imageInput').click()" class="text-teal-500 hover:text-teal-600 px-2"><i class="fas fa-image"></i></button>
                         <button class="btn-post text-sm" id="postBtn" onclick="window.createPost()" disabled>Post</button>
@@ -224,7 +212,6 @@
 
     <!-- FULL SCREEN CHAT ROOM -->
     <div id="fullScreenChat" class="fixed inset-0 z-[200] flex flex-col">
-        <!-- Chat Header -->
         <div class="border-b px-4 py-2 flex items-center justify-between shadow-sm z-10" style="background:var(--card); border-color:var(--border);">
             <div class="flex items-center gap-3">
                 <button onclick="window.closeChatRoom()" class="w-8 h-8 rounded-full flex items-center justify-center transition" style="background:var(--bg2); color:var(--text);">
@@ -236,51 +223,28 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <!-- NAYA: Share Link Button -->
                 <button onclick="window.shareChatLink()" class="text-teal-500 text-xs font-semibold px-2 py-1 rounded border border-teal-500 hover:bg-teal-50"><i class="fas fa-share-alt"></i> Share</button>
                 <button onclick="document.getElementById('activeUsersSidebar').classList.toggle('hidden')" class="md:hidden p-1.5 rounded-lg" style="background:var(--bg2);"><i class="fas fa-users text-sm"></i></button>
             </div>
         </div>
 
-        <!-- Chat Layout -->
         <div class="flex flex-1 overflow-hidden">
-            
-            <!-- Left Sidebar (Active Users & Bots) -->
             <div id="activeUsersSidebar" class="w-full md:w-64 border-r flex flex-col hidden md:flex absolute md:relative inset-0 z-20 md:z-0" style="background:var(--card); border-color:var(--border);">
                 <div class="p-3 border-b flex items-center justify-between" style="background:var(--bg2); border-color:var(--border);">
                     <h3 class="font-bold text-xs text-[var(--text)]">Online (<span id="onlineCount">0</span>/30)</h3>
                     <button onclick="document.getElementById('activeUsersSidebar').classList.add('hidden')" class="md:hidden text-[var(--muted)]"><i class="fas fa-times"></i></button>
                 </div>
-                <div id="onlineUsersList" class="flex-1 overflow-y-auto chat-scroll p-2 space-y-1">
-                    <!-- Users + 10 Bots rendered here -->
-                </div>
+                <div id="onlineUsersList" class="flex-1 overflow-y-auto chat-scroll p-2 space-y-1"></div>
             </div>
 
-            <!-- Main Chat Area -->
             <div class="flex-1 flex flex-col relative" style="background: var(--chat-bg);">
-                
-                <!-- Messages List -->
-                <!-- FIXED RIGHT SIDE CUT-OFF: Added pr-4 and restricted width inside -->
                 <div id="chatMessagesArea" class="flex-1 overflow-y-auto chat-scroll p-3 space-y-3 flex flex-col pr-4 sm:pr-6">
-                    <div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>
-                    <!-- Chat Bubbles -->
+                    <!-- Chat Bubbles rendered here -->
                 </div>
 
-                <!-- Chat Input Footer -->
                 <div class="border-t p-3 relative" style="background:var(--card); border-color:var(--border);">
-                    
-                    <!-- EMOJI PICKER -->
                     <div id="emojiPicker" class="emoji-picker">
-                        <span class="emoji-item" onclick="window.addEmoji('😀')">😀</span>
-                        <span class="emoji-item" onclick="window.addEmoji('😂')">😂</span>
-                        <span class="emoji-item" onclick="window.addEmoji('😍')">😍</span>
-                        <span class="emoji-item" onclick="window.addEmoji('😎')">😎</span>
-                        <span class="emoji-item" onclick="window.addEmoji('🤔')">🤔</span>
-                        <span class="emoji-item" onclick="window.addEmoji('🔥')">🔥</span>
-                        <span class="emoji-item" onclick="window.addEmoji('👍')">👍</span>
-                        <span class="emoji-item" onclick="window.addEmoji('❤️')">❤️</span>
-                        <span class="emoji-item" onclick="window.addEmoji('🎉')">🎉</span>
-                        <span class="emoji-item" onclick="window.addEmoji('👏')">👏</span>
+                        <span class="emoji-item" onclick="window.addEmoji('😀')">😀</span><span class="emoji-item" onclick="window.addEmoji('😂')">😂</span><span class="emoji-item" onclick="window.addEmoji('😍')">😍</span><span class="emoji-item" onclick="window.addEmoji('😎')">😎</span><span class="emoji-item" onclick="window.addEmoji('🤔')">🤔</span><span class="emoji-item" onclick="window.addEmoji('🔥')">🔥</span><span class="emoji-item" onclick="window.addEmoji('👍')">👍</span><span class="emoji-item" onclick="window.addEmoji('❤️')">❤️</span><span class="emoji-item" onclick="window.addEmoji('🎉')">🎉</span><span class="emoji-item" onclick="window.addEmoji('👏')">👏</span>
                     </div>
 
                     <div class="flex items-center gap-2 rounded-full px-3 py-1.5 border transition-all" style="background:var(--bg2); border-color:var(--border);">
@@ -289,13 +253,8 @@
                         <input type="file" id="chatImageInput" accept="image/*" class="hidden" onchange="window.handleChatImage(event)">
                         
                         <input type="text" id="chatInputField" class="flex-1 bg-transparent border-none outline-none text-sm px-1 text-[var(--text)]" placeholder="Type a message..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()">
-                        
-                        <button onclick="window.sendChatMessage()" class="w-7 h-7 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white flex items-center justify-center">
-                            <i class="fas fa-paper-plane text-[0.6rem]"></i>
-                        </button>
+                        <button onclick="window.sendChatMessage()" class="w-7 h-7 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 text-white flex items-center justify-center"><i class="fas fa-paper-plane text-[0.6rem]"></i></button>
                     </div>
-                    
-                    <!-- Image Preview -->
                     <div id="chatImagePreviewBox" class="hidden mt-2 relative inline-block">
                         <img id="chatImgPreview" src="" class="h-12 rounded-lg border border-[var(--border)]">
                         <button onclick="window.clearChatImage()" class="absolute -top-1 -right-1 bg-red-500 text-white w-4 h-4 rounded-full text-[0.6rem]"><i class="fas fa-times"></i></button>
@@ -329,60 +288,30 @@
         let allPostsArray = [];
         let currentContext = { type: 'home', id: null, data: null }; 
 
-        // ==========================================
-        // UI & DARK MODE LOGIC
-        // ==========================================
+        // UI & Dark Mode
         window.toggleDarkMode = function() {
             document.body.classList.toggle('dark-mode');
             const icon = document.getElementById('darkModeIcon');
-            if(document.body.classList.contains('dark-mode')) {
-                icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
+            if(document.body.classList.contains('dark-mode')) { icon.classList.replace('fa-moon', 'fa-sun'); localStorage.setItem('theme', 'dark'); } 
+            else { icon.classList.replace('fa-sun', 'fa-moon'); localStorage.setItem('theme', 'light'); }
         };
+        if(localStorage.getItem('theme') === 'dark') window.toggleDarkMode();
 
-        // Load saved theme
-        if(localStorage.getItem('theme') === 'dark') { window.toggleDarkMode(); }
-
-        window.addEmoji = function(emoji) {
-            const input = document.getElementById('chatInputField');
-            input.value += emoji;
-            document.getElementById('emojiPicker').classList.remove('active');
-            input.focus();
-        };
-
-        window.shareChatLink = function() {
-            const chatUrl = window.location.origin + window.location.pathname + "#chat";
-            if (navigator.share) {
-                navigator.share({ title: 'Join LinkVibe Public Chat', url: chatUrl }).catch(console.error);
-            } else {
-                navigator.clipboard.writeText(chatUrl);
-                window.showToast("Chat link copied!", "success");
-            }
-        };
+        window.addEmoji = function(emoji) { const input = document.getElementById('chatInputField'); input.value += emoji; document.getElementById('emojiPicker').classList.remove('active'); input.focus(); };
+        window.shareChatLink = function() { const chatUrl = window.location.origin + window.location.pathname + "#chat"; if (navigator.share) navigator.share({ title: 'Join LinkVibe Public Chat', url: chatUrl }).catch(()=>{}); else { navigator.clipboard.writeText(chatUrl); window.showToast("Chat link copied!", "success"); } };
 
         // ==========================================
-        // SMART CHAT ROOM (10 BOTS INCLUDED)
+        // SMART CHAT & TALKING BOTS
         // ==========================================
-        let chatUnsubscribe = null;
-        let onlineUnsubscribe = null;
-        let pendingChatImage = null;
+        let chatUnsubscribe = null; let onlineUnsubscribe = null; let pendingChatImage = null;
+        let realChatMessages = []; let botChatMessages = [];
 
-        // 10 Dummy Bots Array
         const dummyBots = [
-            { name: "Sara (Bot)", photo: "https://ui-avatars.com/api/?name=S&background=random" },
-            { name: "Ahmed", photo: "https://ui-avatars.com/api/?name=A&background=random" },
-            { name: "TechGuru", photo: "https://ui-avatars.com/api/?name=T&background=random" },
-            { name: "Zainab", photo: "https://ui-avatars.com/api/?name=Z&background=random" },
-            { name: "CodeNinja", photo: "https://ui-avatars.com/api/?name=C&background=random" },
-            { name: "Usman", photo: "https://ui-avatars.com/api/?name=U&background=random" },
-            { name: "Fatima", photo: "https://ui-avatars.com/api/?name=F&background=random" },
-            { name: "AI Lover", photo: "https://ui-avatars.com/api/?name=A&background=random" },
-            { name: "Bilal", photo: "https://ui-avatars.com/api/?name=B&background=random" },
-            { name: "Ayesha", photo: "https://ui-avatars.com/api/?name=A&background=random" }
+            { name: "Sara (Bot)", photo: "https://ui-avatars.com/api/?name=S&background=random" }, { name: "Ahmed", photo: "https://ui-avatars.com/api/?name=A&background=random" },
+            { name: "TechGuru", photo: "https://ui-avatars.com/api/?name=T&background=random" }, { name: "Zainab", photo: "https://ui-avatars.com/api/?name=Z&background=random" },
+            { name: "CodeNinja", photo: "https://ui-avatars.com/api/?name=C&background=random" }, { name: "Usman", photo: "https://ui-avatars.com/api/?name=U&background=random" },
+            { name: "Fatima", photo: "https://ui-avatars.com/api/?name=F&background=random" }, { name: "AI Lover", photo: "https://ui-avatars.com/api/?name=A&background=random" },
+            { name: "Bilal", photo: "https://ui-avatars.com/api/?name=B&background=random" }, { name: "Ayesha", photo: "https://ui-avatars.com/api/?name=A&background=random" }
         ];
 
         document.getElementById('chatPublicBtn').addEventListener('click', () => {
@@ -393,100 +322,85 @@
 
         window.openChatRoom = async function() {
             document.getElementById('fullScreenChat').classList.add('open');
-            document.body.style.overflow = 'hidden'; 
-            window.location.hash = "chat"; // Update URL for sharing
+            document.body.style.overflow = 'hidden'; window.location.hash = "chat";
 
-            await setDoc(doc(db, "chat_presence", currentUser.uid), {
-                uid: currentUser.uid, name: currentUser.name || currentUser.handle, photo: currentUser.photo || currentUser.photoURL, lastSeen: serverTimestamp()
-            });
+            await setDoc(doc(db, "chat_presence", currentUser.uid), { uid: currentUser.uid, name: currentUser.name || currentUser.handle, photo: currentUser.photo || currentUser.photoURL, lastSeen: serverTimestamp() });
 
             onlineUnsubscribe = onSnapshot(collection(db, "chat_presence"), (snapshot) => {
-                const list = document.getElementById('onlineUsersList');
-                list.innerHTML = '';
-                
-                // Add Real Users
+                const list = document.getElementById('onlineUsersList'); list.innerHTML = '';
                 snapshot.forEach(docSnap => {
                     const user = docSnap.data();
                     list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${user.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${user.name}</span></div>`;
                 });
-
-                // Add 10 Bots
                 dummyBots.forEach(bot => {
                     list.innerHTML += `<div class="flex items-center gap-2 p-1.5 hover:bg-[var(--bg2)] rounded-lg cursor-pointer"><div class="relative"><img src="${bot.photo}" class="w-6 h-6 rounded-full"><div class="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-white rounded-full"></div></div><span class="text-[0.7rem] text-[var(--text)] truncate">${bot.name}</span></div>`;
                 });
-
                 document.getElementById('onlineCount').textContent = snapshot.size + 10;
             });
 
+            // Fetch Real Messages
             const q = query(collection(db, "public_chat"), orderBy("createdAt", "asc"));
             chatUnsubscribe = onSnapshot(q, (snapshot) => {
-                const area = document.getElementById('chatMessagesArea');
-                // Keep the welcome message
-                const welcomeMsg = '<div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>';
-                let messagesHTML = welcomeMsg;
-                
-                const now = Date.now();
-                const twentyMins = 20 * 60 * 1000;
-
+                realChatMessages = [];
+                const now = Date.now(); const twentyMins = 20 * 60 * 1000;
                 snapshot.forEach(docSnap => {
                     const msg = docSnap.data();
-                    const msgId = docSnap.id;
-                    
-                    if(msg.createdAt) {
-                        const msgTime = msg.createdAt.toMillis();
-                        if((now - msgTime) > twentyMins && !msg.isReported) return;
-                    }
-
-                    const isMe = msg.uid === currentUser.uid;
-                    const isAdmin = currentUser.email === ADMIN_EMAIL;
-                    
-                    let toolsHtml = `<button onclick="window.reportMsg('${msgId}')" title="Report" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-exclamation-triangle"></i></button>`;
-                    if(isAdmin || isMe) { toolsHtml += `<button onclick="window.deleteMsg('${msgId}')" title="Delete" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-trash"></i></button>`; }
-                    let mediaHtml = msg.image ? `<img src="${msg.image}" class="mt-2 rounded-xl max-h-32 object-contain">` : '';
-
-                    if(isMe) {
-                        // FIXED: Added width constraints and removed extreme right sticking
-                        messagesHTML += `
-                        <div class="flex justify-end mb-3 w-full">
-                            <div class="flex items-end flex-col max-w-[85%]">
-                                <div class="flex items-center mb-1">${toolsHtml}</div>
-                                <div class="chat-bubble me shadow-sm">
-                                    <p>${msg.text}</p>${mediaHtml}
-                                </div>
-                            </div>
-                        </div>`;
-                    } else {
-                        messagesHTML += `
-                        <div class="flex justify-start mb-3 w-full">
-                            <img src="${msg.authorPic}" class="w-6 h-6 rounded-full border mr-2 self-end mb-1" style="border-color:var(--border);">
-                            <div class="flex items-start flex-col max-w-[85%]">
-                                <span class="text-[0.6rem] text-[var(--muted)] mb-0.5 ml-1">${msg.author}</span>
-                                <div class="chat-bubble other shadow-sm">
-                                    <p>${msg.text}</p>${mediaHtml}
-                                </div>
-                                <div class="flex items-center mt-1">${toolsHtml}</div>
-                            </div>
-                        </div>`;
-                    }
+                    if(msg.createdAt) { const msgTime = msg.createdAt.toMillis(); if((now - msgTime) > twentyMins && !msg.isReported) return; realChatMessages.push({ id: docSnap.id, time: msgTime, ...msg }); }
                 });
-                
-                area.innerHTML = messagesHTML;
-                area.scrollTop = area.scrollHeight;
+                window.renderChatArea();
             });
+
+            // Bot Auto-Chat Interval (Every ~35 seconds)
+            if(!window.botInterval) {
+                window.botInterval = setInterval(() => {
+                    if(!document.getElementById('fullScreenChat').classList.contains('open')) return;
+                    const randomBot = dummyBots[Math.floor(Math.random() * dummyBots.length)];
+                    const msgs = ["Hello everyone! 👋", "LinkVibe ki speed achi hai.", "Koi online hai chat ke liye?", "Tech updates are great today 🔥", "Hi guys!", "Dark mode is looking cool 🌙", "Anyone from Lahore here?"];
+                    botChatMessages.push({ id: 'bot-' + Date.now(), uid: 'bot', author: randomBot.name + ' ✔️', authorPic: randomBot.photo, text: msgs[Math.floor(Math.random() * msgs.length)], time: Date.now(), isBot: true });
+                    if(botChatMessages.length > 20) botChatMessages.shift(); // keep memory clean
+                    window.renderChatArea();
+                }, 35000);
+            }
         };
 
+        window.renderChatArea = function() {
+            const area = document.getElementById('chatMessagesArea');
+            const allMsgs = [...realChatMessages, ...botChatMessages].sort((a, b) => a.time - b.time);
+            
+            let messagesHTML = '<div class="text-center text-[0.65rem] text-[var(--text2)] my-2 px-3 py-1 rounded-full mx-auto" style="background:var(--border);">Welcome! No abuse, numbers, or politics allowed.</div>';
+
+            allMsgs.forEach(msg => {
+                const isMe = msg.uid === currentUser?.uid;
+                const isAdmin = currentUser?.email === ADMIN_EMAIL;
+                let toolsHtml = '';
+                
+                if(!msg.isBot) {
+                    toolsHtml += `<button onclick="window.reportMsg('${msg.id}')" title="Report" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-exclamation-triangle"></i></button>`;
+                    if(isAdmin || isMe) { toolsHtml += `<button onclick="window.deleteMsg('${msg.id}')" title="Delete" class="text-[var(--muted)] hover:text-red-500 text-[0.65rem] mx-1"><i class="fas fa-trash"></i></button>`; }
+                }
+
+                let mediaHtml = msg.image ? `<img src="${msg.image}" class="mt-2 rounded-xl max-h-32 object-contain">` : '';
+
+                if(isMe) {
+                    messagesHTML += `<div class="flex justify-end mb-3 w-full"><div class="flex items-end flex-col max-w-[85%]"><div class="flex items-center mb-1">${toolsHtml}</div><div class="chat-bubble me shadow-sm"><p class="whitespace-pre-wrap">${msg.text}</p>${mediaHtml}</div></div></div>`;
+                } else {
+                    messagesHTML += `<div class="flex justify-start mb-3 w-full"><img src="${msg.authorPic}" class="w-6 h-6 rounded-full border mr-2 self-end mb-1" style="border-color:var(--border);"><div class="flex items-start flex-col max-w-[85%]"><span class="text-[0.6rem] text-[var(--muted)] mb-0.5 ml-1">${msg.author}</span><div class="chat-bubble other shadow-sm"><p class="whitespace-pre-wrap">${msg.text}</p>${mediaHtml}</div><div class="flex items-center mt-1">${toolsHtml}</div></div></div>`;
+                }
+            });
+            area.innerHTML = messagesHTML; area.scrollTop = area.scrollHeight;
+        }
+
         window.closeChatRoom = async function() {
-            document.getElementById('fullScreenChat').classList.remove('open');
-            document.body.style.overflow = 'auto'; 
-            window.location.hash = ""; // Clear hash
-            if(chatUnsubscribe) chatUnsubscribe();
-            if(onlineUnsubscribe) onlineUnsubscribe();
+            document.getElementById('fullScreenChat').classList.remove('open'); document.body.style.overflow = 'auto'; window.location.hash = ""; 
+            if(chatUnsubscribe) chatUnsubscribe(); if(onlineUnsubscribe) onlineUnsubscribe();
+            if(window.botInterval) { clearInterval(window.botInterval); window.botInterval = null; }
             if(currentUser && db) { await deleteDoc(doc(db, "chat_presence", currentUser.uid)); }
         };
 
+        // ADVANCED FILTER: Catches numbers even with spaces/newlines
         function applyWordFilter(text) {
-            let filtered = text.replace(/\b\d{10,12}\b/g, "[Hidden Number]");
-            const badWords = ["gali1", "gali2", "abuse", "politics_name"];
+            let filtered = text.replace(/(?:\d[\s\n\r]*){7,}/g, "[Number Blocked]");
+            const badWords = ["gali", "abuse", "politics", "stupid", "idiot"];
             badWords.forEach(word => { const regex = new RegExp(`\\b${word}\\b`, 'gi'); filtered = filtered.replace(regex, "***"); });
             return filtered;
         }
@@ -495,22 +409,12 @@
         window.clearChatImage = function() { pendingChatImage = null; document.getElementById('chatImageInput').value = ''; document.getElementById('chatImagePreviewBox').classList.add('hidden'); };
 
         window.sendChatMessage = async function() {
-            const input = document.getElementById('chatInputField');
-            let rawText = input.value.trim();
-            document.getElementById('emojiPicker').classList.remove('active'); // close emoji picker if open
+            const input = document.getElementById('chatInputField'); let rawText = input.value.trim(); document.getElementById('emojiPicker').classList.remove('active');
             if(!rawText && !pendingChatImage) return;
 
             const cleanText = applyWordFilter(rawText);
-            input.value = '';
-            const imgToUpload = pendingChatImage;
-            window.clearChatImage();
-
-            try {
-                await addDoc(collection(db, "public_chat"), {
-                    uid: currentUser.uid, author: currentUser.name || currentUser.handle, authorPic: currentUser.photo || currentUser.photoURL,
-                    text: cleanText, image: imgToUpload, isReported: false, createdAt: serverTimestamp()
-                });
-            } catch(e) { showToast("Message fail", "error"); }
+            input.value = ''; const imgToUpload = pendingChatImage; window.clearChatImage();
+            try { await addDoc(collection(db, "public_chat"), { uid: currentUser.uid, author: currentUser.name || currentUser.handle, authorPic: currentUser.photo || currentUser.photoURL, text: cleanText, image: imgToUpload, isReported: false, createdAt: serverTimestamp() }); } catch(e) { showToast("Message fail", "error"); }
         };
 
         window.reportMsg = async function(msgId) { if(confirm("Report this message?")) { await updateDoc(doc(db, "public_chat", msgId), { isReported: true }); showToast("Reported.", "success"); } };

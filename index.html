@@ -101,7 +101,7 @@
         .post-action-btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: var(--muted); transition: all 0.2s; cursor: pointer; border: none; background: none; font-family: inherit; }
         .post-action-btn:hover { background: var(--accent-light); color: var(--accent); }
         .post-action-btn.liked { color: var(--accent); }
-        .post-action-btn.liked i { animation: like-pop 0.35s ease; }
+        .post-action-btn.liked i { animation: like-pop 0.35s ease; font-weight: 900; }
         @keyframes like-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
 
         input, textarea, select { color: var(--text) !important; background: var(--bg) !important; border: 1.5px solid var(--border) !important; border-radius: 10px; transition: all 0.2s; font-family: inherit; }
@@ -145,7 +145,6 @@
         .link-tag { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--accent-light); color: var(--accent); border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 6px; }
         .link-tag button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 0.8rem; padding: 0; font-family: inherit; }
 
-        /* Admin panel styles */
         .admin-sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: none; width: 100%; text-align: left; font-family: inherit; }
         .admin-sidebar-link:hover, .admin-sidebar-link.active { background: var(--accent-light); color: var(--accent); }
         .admin-sidebar-link i { width: 20px; text-align: center; }
@@ -881,11 +880,10 @@
                 imgElement.src = ev.target.result;
                 
                 imgElement.onload = async () => {
-                    // --- IMAGE COMPRESSOR START ---
                     const canvas = document.createElement('canvas');
                     let width = imgElement.width;
                     let height = imgElement.height;
-                    const maxSize = 800; // Limit image pixels to prevent browser hang and Firebase limit
+                    const maxSize = 800;
 
                     if (width > height && width > maxSize) {
                         height = Math.round(height * maxSize / width);
@@ -900,9 +898,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(imgElement, 0, 0, width, height);
 
-                    // Compress to JPEG format with 70% quality
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    // --- IMAGE COMPRESSOR END ---
 
                     const scanImg = new Image();
                     scanImg.src = compressedBase64;
@@ -963,7 +959,6 @@
             return spamBlacklist.some(keyword => lowerText.includes(keyword));
         }
 
-        // ====== FIXED CREATE POST FUNCTION ======
         window.createPost = async function() {
             try {
                 if (!currentUser) return window.openLoginModal();
@@ -984,6 +979,7 @@
                 postBtn.disabled = true;
                 postBtn.innerText = 'Publishing...';
 
+                // Naye features add kiye (likedBy, comments)
                 const post = {
                     text, 
                     uid: currentUser.uid, 
@@ -992,7 +988,8 @@
                     authorHandle: currentUser.handle || 'Member',
                     image: currentImagePreview,
                     link: finalLink,
-                    likes: 0,
+                    likedBy: [],
+                    comments: [],
                     createdAt: serverTimestamp()
                 };
 
@@ -1025,6 +1022,78 @@
                 updatePostBtn(); 
             }
         };
+
+        /* ====== POST ACTIONS LOGIC ====== */
+        
+        window.toggleLike = async function(postId) {
+            if (!currentUser) return window.openLoginModal();
+            const post = allPostsArray.find(p => p.id === postId);
+            if (!post || !db) return;
+
+            let likedBy = post.likedBy || [];
+            if (likedBy.includes(currentUser.uid)) {
+                likedBy = likedBy.filter(id => id !== currentUser.uid); // Unlike
+            } else {
+                likedBy.push(currentUser.uid); // Like
+            }
+
+            try {
+                await updateDoc(doc(db, 'posts', postId), { likedBy: likedBy });
+            } catch(e) {
+                window.showToast("Error updating like", "error");
+            }
+        };
+
+        window.addComment = async function(postId) {
+            if (!currentUser) return window.openLoginModal();
+            const post = allPostsArray.find(p => p.id === postId);
+            if (!post || !db) return;
+
+            const text = prompt("Write your comment:");
+            if (!text || text.trim() === '') return;
+
+            let comments = post.comments || [];
+            comments.push({
+                uid: currentUser.uid,
+                author: currentUser.name || 'User',
+                text: text.trim(),
+                time: Date.now()
+            });
+
+            try {
+                await updateDoc(doc(db, 'posts', postId), { comments: comments });
+                window.showToast("Comment added!", "success");
+            } catch(e) {
+                window.showToast("Error adding comment", "error");
+            }
+        };
+
+        window.sharePost = function(postId) {
+            const post = allPostsArray.find(p => p.id === postId);
+            if(!post) return;
+            const shareTitle = post.author + "'s Post on FriendsFlow";
+            const shareText = post.text || 'Check out this post!';
+            const shareUrl = window.location.href;
+
+            if (navigator.share) {
+                navigator.share({ title: shareTitle, text: shareText, url: shareUrl }).catch(err => console.error(err));
+            } else {
+                navigator.clipboard.writeText(shareText + " " + shareUrl);
+                window.showToast("Post text copied to clipboard!", "success");
+            }
+        };
+
+        window.savePost = function(postId) {
+            let saved = JSON.parse(localStorage.getItem('savedPosts') || '[]');
+            if(!saved.includes(postId)) {
+                saved.push(postId);
+                localStorage.setItem('savedPosts', JSON.stringify(saved));
+                window.showToast("Post saved to bookmarks!", "success");
+            } else {
+                window.showToast("Post is already saved", "info");
+            }
+        };
+
 
         /* ====== FETCH POSTS ====== */
         if (db) {
@@ -1064,6 +1133,13 @@
                 const imgHtml = post.image ? `<div><img src="${post.image}" style="width:100%; max-height:420px; object-fit:cover;"></div>` : '';
                 const linkHtml = post.link ? `<a href="${post.link.startsWith('http') ? post.link : 'https://'+post.link}" target="_blank" rel="noopener" class="link-preview"><i class="fas fa-external-link-alt"></i> ${post.link.length > 50 ? post.link.substring(0,50)+'...' : post.link}</a>` : '';
                 const time = timeAgo(post.createdAt);
+                
+                // Likes aur Comments Count Logic
+                let isLiked = currentUser && post.likedBy && post.likedBy.includes(currentUser.uid);
+                let likeCount = post.likedBy ? post.likedBy.length : 0;
+                let commentCount = post.comments ? post.comments.length : 0;
+                let latestComment = commentCount > 0 ? post.comments[commentCount - 1] : null;
+
                 html += `
                 <article class="card post-card fade-in" style="animation-delay:${i<5?i*0.05:0}s;">
                     <div class="p-4 pb-2 flex items-start gap-3">
@@ -1080,12 +1156,19 @@
                     <div class="px-4 py-2"><p class="text-sm whitespace-pre-wrap" style="color:var(--text); line-height:1.65;">${post.text||''}</p></div>
                     ${imgHtml}
                     ${linkHtml ? `<div class="px-4 pb-2">${linkHtml}</div>` : ''}
+                    
                     <div style="padding:8px 16px; border-top:1px solid var(--border); margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <button class="post-action-btn" onclick="this.classList.toggle('liked')"><i class="far fa-thumbs-up"></i> Like</button>
-                        <button class="post-action-btn"><i class="far fa-comment"></i> Comment</button>
-                        <button class="post-action-btn"><i class="fas fa-share"></i> Share</button>
-                        <button class="post-action-btn"><i class="far fa-bookmark"></i> Save</button>
+                        <button class="post-action-btn ${isLiked ? 'liked' : ''}" onclick="window.toggleLike('${post.id}')"><i class="far fa-thumbs-up"></i> ${likeCount > 0 ? likeCount : 'Like'}</button>
+                        <button class="post-action-btn" onclick="window.addComment('${post.id}')"><i class="far fa-comment"></i> ${commentCount > 0 ? commentCount : 'Comment'}</button>
+                        <button class="post-action-btn" onclick="window.sharePost('${post.id}')"><i class="fas fa-share"></i> Share</button>
+                        <button class="post-action-btn" onclick="window.savePost('${post.id}')"><i class="far fa-bookmark"></i> Save</button>
                     </div>
+                    
+                    ${latestComment ? `
+                    <div style="padding: 12px 16px; background: var(--bg2); border-top: 1px solid var(--border); font-size: 0.8rem;">
+                        <strong style="color:var(--text);">${latestComment.author}:</strong> <span style="color:var(--text2);">${latestComment.text}</span>
+                        ${commentCount > 1 ? `<div style="color:var(--muted); font-size:0.7rem; margin-top:4px; cursor:pointer;">View all ${commentCount} comments</div>` : ''}
+                    </div>` : ''}
                 </article>`;
             });
             c.innerHTML = html;
